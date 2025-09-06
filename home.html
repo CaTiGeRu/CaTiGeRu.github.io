@@ -1380,4 +1380,351 @@
           category: document.getElementById('articleCategory').value,
           cover: document.getElementById('articleCover').value,
           content: markdownContent, // 存储Markdown原始文本
-          isMarkdown: true // 标记
+          isMarkdown: true // 标记为Markdown格式
+        };
+        
+        // 保存文章
+        saveArticleToGitHub(article)
+          .then(savedArticle => {
+            // 重置表单
+            articleForm.reset();
+            document.getElementById('articleId').value = '';
+            editorContent.innerText = '';
+            document.getElementById('submitBtnText').textContent = '发布文章';
+            
+            // 显示成功通知
+            showNotification('成功', savedArticle.id ? '文章已更新' : '文章已发布');
+            
+            // 切换到首页
+            document.querySelector('[data-page="home"]').click();
+          })
+          .catch(error => {
+            console.error('保存文章失败:', error);
+            showNotification('错误', '保存文章失败，请稍后重试', true);
+          });
+      });
+      
+      // 取消编辑按钮
+      document.getElementById('cancelEditBtn').addEventListener('click', () => {
+        // 重置表单
+        articleForm.reset();
+        document.getElementById('articleId').value = '';
+        document.getElementById('articleContent').innerText = '';
+        document.getElementById('submitBtnText').textContent = '发布文章';
+        
+        // 切换到首页
+        document.querySelector('[data-page="home"]').click();
+      });
+      
+      // 新增文章按钮
+      document.getElementById('addNewArticleBtn').addEventListener('click', () => {
+        // 重置表单
+        articleForm.reset();
+        document.getElementById('articleId').value = '';
+        document.getElementById('articleContent').innerText = '';
+        document.getElementById('submitBtnText').textContent = '发布文章';
+        
+        // 切换到写文章页面
+        document.querySelector('[data-page="write"]').click();
+      });
+      
+      // 分类筛选
+      document.querySelectorAll('.category-filter').forEach(btn => {
+        btn.addEventListener('click', function() {
+          // 更新按钮样式
+          document.querySelectorAll('.category-filter').forEach(b => {
+            b.classList.remove('bg-orange', 'text-white');
+            b.classList.add('bg-white', 'border', 'border-neutral-300', 'hover:border-orange', 'hover:text-orange');
+          });
+          this.classList.remove('bg-white', 'border', 'border-neutral-300', 'hover:border-orange', 'hover:text-orange');
+          this.classList.add('bg-orange', 'text-white');
+          
+          // 筛选文章
+          const category = this.getAttribute('data-category');
+          loadArticles(category);
+        });
+      });
+      
+      // 排序按钮
+      document.querySelectorAll('.sort-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          // 更新按钮样式
+          document.querySelectorAll('.sort-btn').forEach(b => {
+            b.classList.remove('active');
+          });
+          this.classList.add('active');
+          
+          // 排序文章
+          currentSort = this.getAttribute('data-sort');
+          currentPage = 1; // 重置到第一页
+          loadManageArticles(document.getElementById('manageSearchInput').value);
+        });
+      });
+      
+      // 搜索文章
+      const manageSearchInput = document.getElementById('manageSearchInput');
+      manageSearchInput.addEventListener('input', function() {
+        currentPage = 1; // 重置到第一页
+        loadManageArticles(this.value);
+      });
+      
+      // 分页按钮
+      document.getElementById('prevPageBtn').addEventListener('click', () => {
+        if (currentPage > 1) {
+          currentPage--;
+          loadManageArticles(manageSearchInput.value);
+        }
+      });
+      
+      document.getElementById('nextPageBtn').addEventListener('click', () => {
+        const totalPages = Math.ceil(articles.length / articlesPerPage);
+        if (currentPage < totalPages) {
+          currentPage++;
+          loadManageArticles(manageSearchInput.value);
+        }
+      });
+      
+      // 全选复选框
+      document.getElementById('selectAllCheckbox').addEventListener('change', function() {
+        const isChecked = this.checked;
+        const checkboxes = document.querySelectorAll('.article-checkbox');
+        
+        checkboxes.forEach(checkbox => {
+          checkbox.checked = isChecked;
+        });
+        
+        // 更新选中的文章ID
+        selectedArticleIds = isChecked 
+          ? Array.from(checkboxes).map(cb => parseInt(cb.getAttribute('data-id')))
+          : [];
+      });
+      
+      // 文章复选框
+      document.addEventListener('change', function(e) {
+        if (e.target.classList.contains('article-checkbox')) {
+          const articleId = parseInt(e.target.getAttribute('data-id'));
+          
+          if (e.target.checked) {
+            selectedArticleIds.push(articleId);
+          } else {
+            selectedArticleIds = selectedArticleIds.filter(id => id !== articleId);
+          }
+          
+          // 更新全选框状态
+          const checkboxes = document.querySelectorAll('.article-checkbox');
+          const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+          document.getElementById('selectAllCheckbox').checked = allChecked;
+        }
+      });
+      
+      // 批量删除按钮
+      document.getElementById('batchDeleteBtn').addEventListener('click', () => {
+        if (selectedArticleIds.length === 0) {
+          showNotification('提示', '请先选择要删除的文章', false);
+          return;
+        }
+        
+        // 显示确认对话框
+        document.getElementById('deleteConfirmModal').classList.remove('hidden');
+        articleToDelete = null; // 标记为批量删除
+      });
+      
+      // 编辑文章按钮
+      document.addEventListener('click', function(e) {
+        if (e.target.closest('.edit-article')) {
+          e.preventDefault();
+          const articleId = parseInt(e.target.closest('.edit-article').getAttribute('data-id'));
+          const article = articles.find(a => a.id === articleId);
+          
+          if (article) {
+            // 填充表单
+            document.getElementById('articleId').value = article.id;
+            document.getElementById('articleTitle').value = article.title;
+            document.getElementById('articleCategory').value = article.category;
+            document.getElementById('articleCover').value = article.cover || '';
+            document.getElementById('articleContent').innerText = article.content || '';
+            document.getElementById('submitBtnText').textContent = '更新文章';
+            
+            // 切换到写文章页面
+            document.querySelector('[data-page="write"]').click();
+            
+            // 滚动到页面顶部
+            window.scrollTo({
+              top: 0,
+              behavior: 'smooth'
+            });
+          }
+        }
+      });
+      
+      // 删除文章按钮
+      document.addEventListener('click', function(e) {
+        if (e.target.closest('.delete-article')) {
+          e.preventDefault();
+          articleToDelete = parseInt(e.target.closest('.delete-article').getAttribute('data-id'));
+          
+          // 显示确认对话框
+          document.getElementById('deleteConfirmModal').classList.remove('hidden');
+        }
+      });
+      
+      // 取消删除
+      document.getElementById('cancelDeleteBtn').addEventListener('click', () => {
+        document.getElementById('deleteConfirmModal').classList.add('hidden');
+        articleToDelete = null;
+      });
+      
+      // 确认删除
+      document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
+        document.getElementById('deleteConfirmModal').classList.add('hidden');
+        
+        if (articleToDelete !== null) {
+          // 删除单篇文章
+          deleteArticle(articleToDelete);
+        } else if (selectedArticleIds.length > 0) {
+          // 批量删除文章
+          batchDeleteArticles(selectedArticleIds);
+        }
+        
+        articleToDelete = null;
+        selectedArticleIds = [];
+      });
+      
+      // 关闭通知
+      document.getElementById('closeNotification').addEventListener('click', hideNotification);
+      
+      // 预览按钮
+      document.getElementById('previewBtn').addEventListener('click', () => {
+        const title = document.getElementById('articleTitle').value;
+        const category = document.getElementById('articleCategory').value;
+        const content = document.getElementById('articleContent').innerText;
+        
+        // 渲染Markdown内容
+        marked.setOptions({ sanitize: true, breaks: true });
+        const htmlContent = marked.parse(content || '');
+        
+        // 填充预览内容
+        const previewContent = document.getElementById('previewContent');
+        previewContent.innerHTML = `
+          <h1 class="text-2xl font-bold mb-4">${title || '无标题'}</h1>
+          <div class="mb-6 text-neutral-600">
+            ${category ? `<span class="bg-orange-light text-orange px-2 py-1 rounded-full text-sm">${category}</span>` : ''}
+            <span class="ml-2"><i class="fa fa-clock-o mr-1" aria-hidden="true"></i> 预览模式</span>
+          </div>
+          <div class="markdown-render">${htmlContent}</div>
+        `;
+        
+        // 渲染LaTeX公式
+        renderMathInElement(previewContent, {
+          delimiters: [
+            { left: '$$', right: '$$', display: true },
+            { left: '$', right: '$', display: false },
+            { left: '\\(', right: '\\)', display: false },
+            { left: '\\[', right: '\\]', display: true }
+          ],
+          throwOnError: false
+        });
+        
+        // 显示预览模态框
+        document.getElementById('previewModal').classList.remove('hidden');
+      });
+      
+      // 关闭预览
+      document.getElementById('closePreviewBtn').addEventListener('click', () => {
+        document.getElementById('previewModal').classList.add('hidden');
+      });
+      
+      // Markdown编辑器工具栏功能
+      document.querySelectorAll('.editor-toolbar button').forEach(button => {
+        button.addEventListener('click', function() {
+          const action = this.getAttribute('data-action');
+          const editor = document.getElementById('articleContent');
+          
+          // 获取光标位置和选中内容
+          const selection = window.getSelection();
+          const selectedText = selection.toString();
+          
+          // 保存当前光标位置以便插入后恢复
+          const range = selection.getRangeAt(0);
+          const temp = document.createElement('span');
+          range.insertNode(temp);
+          
+          // 根据不同操作处理内容
+          switch (action) {
+            case 'h1':
+              wrapSelection(editor, '# ', '', selectedText || '一级标题');
+              break;
+            case 'h2':
+              wrapSelection(editor, '## ', '', selectedText || '二级标题');
+              break;
+            case 'bold':
+              wrapSelection(editor, '**', '**', selectedText || '粗体文本');
+              break;
+            case 'italic':
+              wrapSelection(editor, '*', '*', selectedText || '斜体文本');
+              break;
+            case 'strike':
+              wrapSelection(editor, '~~', '~~', selectedText || '删除线文本');
+              break;
+            case 'ul':
+              wrapSelection(editor, '- ', '', selectedText || '列表项');
+              break;
+            case 'ol':
+              wrapSelection(editor, '1. ', '', selectedText || '列表项');
+              break;
+            case 'quote':
+              wrapSelection(editor, '> ', '', selectedText || '引用内容');
+              break;
+            case 'code':
+              wrapSelection(editor, '```\n', '\n```', selectedText || '代码块');
+              break;
+            case 'link':
+              wrapSelection(editor, '[', '](url)', selectedText || '链接文本');
+              break;
+            case 'image':
+              wrapSelection(editor, '![', '](url)', selectedText || '图片描述');
+              break;
+            case 'latex-inline':
+              wrapSelection(editor, '$', '$', selectedText || 'E=mc^2');
+              break;
+            case 'latex-block':
+              wrapSelection(editor, '$$\n', '\n$$', selectedText || '\\sum_{i=1}^n x_i');
+              break;
+            case 'clear':
+              editor.innerText = '';
+              break;
+          }
+          
+          // 恢复光标位置
+          const newRange = document.createRange();
+          newRange.setStartAfter(temp);
+          newRange.setEndAfter(temp);
+          selection.removeAllRanges();
+          selection.addRange(newRange);
+          temp.remove();
+          
+          // 聚焦编辑器
+          editor.focus();
+        });
+      });
+      
+      // 辅助函数：在选中的文本前后添加内容
+      function wrapSelection(editor, prefix, suffix, defaultText) {
+        const selection = window.getSelection();
+        const range = selection.getRangeAt(0);
+        
+        if (selection.toString()) {
+          // 替换选中的文本
+          const newText = prefix + selection.toString() + suffix;
+          range.deleteContents();
+          range.insertNode(document.createTextNode(newText));
+        } else {
+          // 如果没有选中文本，插入默认文本
+          range.insertNode(document.createTextNode(prefix + defaultText + suffix));
+        }
+      }
+    }
+  </script>
+</body>
+</html>
+    
