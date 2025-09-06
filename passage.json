@@ -1,11 +1,23 @@
 [
   {
+    "id": 1757192419083,
+    "title": "2021成都中考游记",
+    "category": "生活",
+    "cover": "https://catigeru.github.io/126_2024110596.jpg",
+    "content": "发挥失常，平常``640``，中考``628``，然后没有然后了。\n\n并不打算退役，只有去高新继续并开始了。",
+    "isMarkdown": true,
+    "date": "2025-09-06",
+    "readTime": 1
+  },
+  {
     "id": 1757191862570,
     "title": "排列期望逆序对个数",
     "category": "技术",
     "cover": "https://catigeru.github.io/083_2024112395.jpg",
-    "content": "### rt\n\n### 法一\n\n设 $f(i,j)$ 表示 $(i,j)$ 对答案的贡献。\n\n则 $E(\\Sigma f(i,j))=\\Sigma E(f(i,j))=\\Sigma\\frac{1}{2}=\\frac{n(n-1)}{4}$\n\n### 法二\n\n猜想逆序数期望为最坏情况的一半。\n\n已知每种逆序数为 $k$ 的排列一定能够唯一地对应一种逆序数为 $\\frac{n(n-1)}{2}-k$ 的排列，即 $1->n,2->n-1...$，所以猜想得证，即 $\\frac{n(n-1)}{4}$。",
-    "isMarkdown": true
+    "content": "",
+    "isMarkdown": true,
+    "date": "2025-09-06",
+    "readTime": 2
   },
   {
     "id": 1757191553048,
