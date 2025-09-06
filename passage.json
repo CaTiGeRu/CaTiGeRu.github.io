@@ -13,7 +13,7 @@
     "id": 1757191553048,
     "title": "自适应辛普森积分学习笔记",
     "category": "技术",
-    "cover": "https://github.com/CaTiGeRu/CaTiGeRu.github.io/blob/main/083_2024112395.jpg",
+    "cover": "https://catigeru.github.io/109636836_p0.jpg",
     "content": "###### 前言\n\n~~之前的微积分学习笔记似乎咕咕咕了？~~\n\n## 问题\n\n求 $\\int^b_a{f(x)}{dx}$\n\n## 算法\n\n考虑将函数 $f(x)$ 用二次函数拟合： $f(x)\\approx Ax^2+Bx+C$。\n\n那么 $\\int^b_a{f(x)dx}\\approx\\int^b_a{(Ax^2+Bx+C)}{dx}$\n\n$=\\frac{A(b^3-a^3)}{3}+\\frac{B(b^2-a^2)}{2}+C(b-a)$\n\n$=\\frac{2A(b^3-a^3)+3B(b^2-a^2)+6C(b-a)}{6}$\n\n$=\\frac{2A(b-a)(a^2+ab+b^2)+3B(b-a)(a+b)+6C(b-a)}{6}$\n\n$=\\frac{(b-a)(2Aa^2+2Aab+2Ab^2+3Ba+3Bb+6C)}{6}$\n\n$=\\frac{(b-a)(Aa^2+Ba+C+Ab^2+Bb+C+Aa^2+2Aab+Ab^2+2Ba+2Bb+4C)}{6}$\n\n$=\\frac{(b-a)((Aa^2+Ba+C) + (Ab^2+Bb+C) + 4(A(\\frac{a+b}{2})^2+B(\\frac{a+b}{2})+C)}{6}$\n\n$\\approx\\frac{(b-a)(f(a)+f(b)+4f(\\frac{a+b}{2}))}{6}$\n\n至此，我们得到了一个可以近似计算 $\\int^b_a{f(x)}{dx}$ 的公式。\n\n但是由于用二次函数拟合是有很大误差的，但是 $(a-b)$ 越小，误差就越小，所以考虑将函数分解为多段区间进行求解。但是如果分多了效率就低，不然精度就低。所以考虑对于求区间 $[l,r]$ 的积分，取中点 $mid$，以 $|F(l,r)-F(l,mid)-F(mid,r)|$ 作为误差，若该值小于要求精度值，那么直接以 $F(l,r)$ 作为解返回即可，否则递归求解 $[l,mid]$ 和 $[mid, r]$。\n\n这就是自适应辛普森积分。\n\n## 代码\n\n```cpp\ndouble F(double l, double r){\n    return (r - l) * (f(l) + f(r) + f((l + r) / 2.0)) / 6;\n}\n\ndouble cal(double l, double r){\n    double mid = (l + r) / 2.0;\n    if (fabs(F(l, r) - F(l, mid) - F(mid, r)) < esp) return F(l, r);\n    return cal(l, mid) + cal(mid, r);\n}\n```",
     "isMarkdown": true
   }
