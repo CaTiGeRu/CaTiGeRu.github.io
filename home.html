@@ -1,13 +1,19 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8"> <!-- 确保UTF-8编码声明在最前面 -->
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>大柯的blog</title>
   <!-- 引入Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- 引入Font Awesome -->
   <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <!-- 引入Markdown解析库 -->
+  <script src="https://cdn.jsdelivr.net/npm/marked@4.0.2/marked.min.js"></script>
+  <!-- 引入LaTeX渲染库 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js"></script>
   
   <!-- 配置Tailwind自定义颜色和字体 -->
   <script>
@@ -125,6 +131,29 @@
       box-shadow: 0 0 0 2px rgba(255, 152, 0, 0.3);
     }
     
+    /* Markdown编辑器样式 */
+    .markdown-editor {
+      font-family: 'Consolas', 'Monaco', monospace;
+      line-height: 1.6;
+    }
+    
+    /* Markdown预览样式 */
+    .markdown-preview h1 { font-size: 2em; margin: 0.67em 0; }
+    .markdown-preview h2 { font-size: 1.5em; margin: 0.83em 0; }
+    .markdown-preview h3 { font-size: 1.17em; margin: 1em 0; }
+    .markdown-preview h4, .markdown-preview h5, .markdown-preview h6 { margin: 1.33em 0; }
+    .markdown-preview p { margin: 1em 0; }
+    .markdown-preview ul, .markdown-preview ol { margin: 1em 0 1em 2em; }
+    .markdown-preview blockquote { border-left: 4px solid #FF9800; padding-left: 1em; margin: 1em 0; color: #616161; }
+    .markdown-preview pre { background: #f5f5f5; padding: 1em; border-radius: 4px; overflow-x: auto; }
+    .markdown-preview code { background: #f5f5f5; padding: 0.2em 0.4em; border-radius: 4px; }
+    .markdown-preview img { max-width: 100%; height: auto; margin: 1em 0; }
+    .markdown-preview a { color: #FF9800; text-decoration: none; }
+    .markdown-preview a:hover { text-decoration: underline; }
+    .markdown-preview table { border-collapse: collapse; margin: 1em 0; width: 100%; }
+    .markdown-preview th, .markdown-preview td { border: 1px solid #ddd; padding: 0.5em; text-align: left; }
+    .markdown-preview th { background-color: #f5f5f5; }
+    
     /* 管理表格样式 */
     .manage-table tr {
       transition: background-color 0.2s ease;
@@ -144,52 +173,10 @@
       transform: rotate(180deg);
     }
     
-    /* 文章阅读页样式 */
-    .article-content p {
-      margin-bottom: 1.5rem;
-      line-height: 1.8;
-    }
-    
-    .article-content h2 {
-      font-size: 1.8rem;
-      font-weight: bold;
-      margin: 2rem 0 1rem;
-      color: #212121;
-    }
-    
-    .article-content h3 {
-      font-size: 1.4rem;
-      font-weight: bold;
-      margin: 1.5rem 0 0.8rem;
-      color: #212121;
-    }
-    
-    .article-content img {
-      max-width: 100%;
-      height: auto;
-      border-radius: 0.5rem;
-      margin: 1.5rem 0;
-    }
-    
-    .article-content ul, .article-content ol {
-      margin: 1rem 0 1.5rem 1.5rem;
-      line-height: 1.8;
-    }
-    
-    .article-content ul {
-      list-style-type: disc;
-    }
-    
-    .article-content ol {
-      list-style-type: decimal;
-    }
-    
-    .article-content blockquote {
-      border-left: 4px solid #FF9800;
-      padding-left: 1rem;
-      margin: 1.5rem 0;
-      color: #616161;
-      font-style: italic;
+    /* 编辑模式切换按钮 */
+    .edit-mode-tabs button.active {
+      background-color: #FF9800;
+      color: white;
     }
   </style>
 </head>
@@ -252,7 +239,7 @@
         <section class="gradient-bg text-white py-16 md:py-24">
           <div class="container mx-auto px-4 text-center">
             <h1 class="text-4xl md:text-6xl font-bold mb-4 text-shadow">大柯的blog</h1>
-            <p class="text-lg md:text-xl max-w-2xl mx-auto opacity-90">分享生活、技术与思考的个人空间</p>
+            <p class="text-lg md:text-xl max-w-2xl mx-auto opacity-90">支持Markdown和LaTeX的个人博客空间</p>
           </div>
         </section>
         
@@ -330,7 +317,7 @@
               
               <h1 id="articleReadTitle" class="text-3xl md:text-4xl font-bold mb-6"></h1>
               
-              <div id="articleReadContent" class="article-content text-lg text-neutral-800"></div>
+              <div id="articleReadContent" class="markdown-preview text-lg text-neutral-800"></div>
               
               <!-- 文章操作按钮 -->
               <div class="mt-12 pt-6 border-t border-neutral-200 flex flex-wrap gap-4 justify-between items-center">
@@ -359,7 +346,7 @@
           <div class="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6">
             <div id="prevArticleContainer" class="bg-white rounded-xl shadow-md p-4 md:p-6 hidden">
               <p class="text-sm text-neutral-600 mb-2">上一篇</p>
-              <a href="#" class="text-lg font-medium hover:text-orange transition-colors prev-article-link">
+              <a href="#" class="text-lg font-medium hover:text-orange transition-colors prev-article-link" data-id="">
                 <i class="fa fa-angle-left mr-1" aria-hidden="true"></i>
                 <span id="prevArticleTitle"></span>
               </a>
@@ -367,7 +354,7 @@
             
             <div id="nextArticleContainer" class="bg-white rounded-xl shadow-md p-4 md:p-6 hidden md:text-right">
               <p class="text-sm text-neutral-600 mb-2">下一篇</p>
-              <a href="#" class="text-lg font-medium hover:text-orange transition-colors next-article-link">
+              <a href="#" class="text-lg font-medium hover:text-orange transition-colors next-article-link" data-id="">
                 <span id="nextArticleTitle"></span>
                 <i class="fa fa-angle-right ml-1" aria-hidden="true"></i>
               </a>
@@ -418,51 +405,252 @@
               <p class="text-sm text-neutral-500 mt-1">建议尺寸：600x400px，支持网络图片URL</p>
             </div>
             
-            <div class="mb-6">
-              <label class="block text-neutral-700 font-medium mb-2">内容编辑</label>
-              
-              <!-- 编辑器工具栏 -->
-              <div class="editor-toolbar flex flex-wrap gap-2 p-3 bg-neutral-100 rounded-t-lg border border-b-0 border-neutral-300">
-                <button type="button" data-action="bold" title="加粗">
-                  <i class="fa fa-bold" aria-hidden="true"></i>
+            <!-- 编辑模式切换 -->
+            <div class="mb-4">
+              <div class="edit-mode-tabs flex border-b border-neutral-300">
+                <button type="button" id="markdownModeBtn" class="px-4 py-2 font-medium active">
+                  <i class="fa fa-markdown mr-1" aria-hidden="true"></i> Markdown编辑
                 </button>
-                <button type="button" data-action="italic" title="斜体">
-                  <i class="fa fa-italic" aria-hidden="true"></i>
+                <button type="button" id="previewModeBtn" class="px-4 py-2 font-medium text-neutral-600">
+                  <i class="fa fa-eye mr-1" aria-hidden="true"></i> 预览
                 </button>
-                <button type="button" data-action="link" title="插入链接">
-                  <i class="fa fa-link" aria-hidden="true"></i>
-                </button>
-                <button type="button" data-action="image" title="插入图片">
-                  <i class="fa fa-image" aria-hidden="true"></i>
-                </button>
-                <button type="button" data-action="heading" title="标题">
-                  <i class="fa fa-header" aria-hidden="true"></i>
-                </button>
-                <button type="button" data-action="list" title="列表">
-                  <i class="fa fa-list-ul" aria-hidden="true"></i>
-                </button>
-                <button type="button" data-action="clear" title="清除格式">
-                  <i class="fa fa-eraser" aria-hidden="true"></i>
+                <button type="button" id="splitModeBtn" class="px-4 py-2 font-medium text-neutral-600">
+                  <i class="fa fa-columns mr-1" aria-hidden="true"></i> 分屏编辑
                 </button>
               </div>
-              
-              <!-- 编辑器内容区 -->
-              <div id="articleContent" class="editor-content w-full min-h-[300px] px-4 py-3 rounded-b-lg border border-neutral-300 focus:outline-none"
-                   contenteditable="true" placeholder="开始撰写文章内容..."></div>
             </div>
             
-            <div class="flex justify-end gap-4">
+            <!-- 编辑器工具栏 - Markdown专用 -->
+            <div class="editor-toolbar flex flex-wrap gap-2 p-3 bg-neutral-100 rounded-t-lg border border-b-0 border-neutral-300">
+              <button type="button" data-action="heading1" title="标题1">
+                <i class="fa fa-header" aria-hidden="true"></i> <sub>1</sub>
+              </button>
+              <button type="button" data-action="heading2" title="标题2">
+                <i class="fa fa-header" aria-hidden="true"></i> <sub>2</sub>
+              </button>
+              <button type="button" data-action="heading3" title="标题3">
+                <i class="fa fa-header" aria-hidden="true"></i> <sub>3</sub>
+              </button>
+              <span class="h-6 border-r border-neutral-300"></span>
+              <button type="button" data-action="bold" title="加粗 (**粗体**)">
+                <i class="fa fa-bold" aria-hidden="true"></i>
+              </button>
+              <button type="button" data-action="italic" title="斜体 (*斜体*)">
+                <i class="fa fa-italic" aria-hidden="true"></i>
+              </button>
+              <button type="button" data-action="strikethrough" title="删除线 (~~删除线~~)">
+                <i class="fa fa-strikethrough" aria-hidden="true"></i>
+              </button>
+              <span class="h-6 border-r border-neutral-300"></span>
+              <button type="button" data-action="link" title="链接 ([文本](链接))">
+                <i class="fa fa-link" aria-hidden="true"></i>
+              </button>
+              <button type="button" data-action="image" title="图片 (![描述](链接))">
+                <i class="fa fa-image" aria-hidden="true"></i>
+              </button>
+              <button type="button" data-action="code" title="代码 (`代码`)">
+                <i class="fa fa-code" aria-hidden="true"></i>
+              </button>
+              <span class="h-6 border-r border-neutral-300"></span>
+              <button type="button" data-action="quote" title="引用 (> 引用)">
+                <i class="fa fa-quote-right" aria-hidden="true"></i>
+              </button>
+              <button type="button" data-action="unordered-list" title="无序列表 (- 列表项)">
+                <i class="fa fa-list-ul" aria-hidden="true"></i>
+              </button>
+              <button type="button" data-action="ordered-list" title="有序列表 (1. 列表项)">
+                <i class="fa fa-list-ol" aria-hidden="true"></i>
+              </button>
+              <span class="h-6 border-r border-neutral-300"></span>
+              <button type="button" data-action="latex" title="LaTeX公式 ($公式$ 或 $$块公式$$)">
+                <i class="fa fa-superscript" aria-hidden="true"></i> TeX
+              </button>
+              <button type="button" data-action="table" title="表格">
+                <i class="fa fa-table" aria-hidden="true"></i>
+              </button>
+              <button type="button" data-action="hr" title="分割线 (---)">
+                <i class="fa fa-minus" aria-hidden="true"></i>
+              </button>
+            </div>
+            
+            <!-- 编辑器容器 -->
+            <div class="border border-neutral-300 rounded-b-lg overflow-hidden">
+              <!-- Markdown编辑区 -->
+              <div id="markdownEditor" class="w-full min-h-[400px] p-4 bg-white">
+                <textarea id="articleContent" class="markdown-editor w-full h-full min-h-[400px] p-2 focus:outline-none resize-none" 
+                          placeholder="使用Markdown编写文章内容...
+支持的格式:
+# 标题
+**粗体** *斜体*
+- 列表项
+[链接](url)
+![图片](url)
+`代码`
+> 引用
+LaTeX公式: $E=mc^2$ 或 $$\sum_{i=1}^n i$$
+"></textarea>
+              </div>
+              
+              <!-- 预览区 -->
+              <div id="previewArea" class="w-full min-h-[400px] p-4 bg-neutral-50 hidden markdown-preview"></div>
+              
+              <!-- 分屏编辑区 -->
+              <div id="splitEditor" class="hidden">
+                <div class="flex h-[400px]">
+                  <div class="w-1/2 border-r border-neutral-300">
+                    <textarea id="splitArticleContent" class="markdown-editor w-full h-full p-4 focus:outline-none resize-none" 
+                              placeholder="使用Markdown编写文章内容..."></textarea>
+                  </div>
+                  <div id="splitPreviewArea" class="w-1/2 p-4 overflow-y-auto markdown-preview"></div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="flex justify-end gap-4 mt-6">
               <button type="button" id="cancelEditBtn" class="px-6 py-3 bg-white border border-neutral-300 text-neutral-700 rounded-full font-medium hover:bg-neutral-100 transition-colors">
                 取消
               </button>
-              <button type="button" id="previewBtn" class="px-6 py-3 bg-white border border-neutral-300 text-neutral-700 rounded-full font-medium hover:bg-neutral-100 transition-colors">
-                预览
+              <button type="button" id="helpBtn" class="px-6 py-3 bg-white border border-neutral-300 text-neutral-700 rounded-full font-medium hover:bg-neutral-100 transition-colors">
+                <i class="fa fa-question-circle mr-1" aria-hidden="true"></i> 格式帮助
               </button>
               <button type="submit" class="px-6 py-3 bg-orange hover:bg-orange-dark text-white rounded-full font-medium transition-colors">
                 <span id="submitBtnText">发布文章</span> <i class="fa fa-paper-plane ml-1" aria-hidden="true"></i>
               </button>
             </div>
           </form>
+        </div>
+      </div>
+      
+      <!-- 格式帮助模态框 -->
+      <div id="helpModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden fade-in">
+        <div class="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto m-4">
+          <div class="p-6 border-b border-neutral-200 flex justify-between items-center">
+            <h3 class="text-xl font-bold">Markdown格式帮助</h3>
+            <button id="closeHelpBtn" class="text-neutral-500 hover:text-neutral-800 transition-colors">
+              <i class="fa fa-times text-xl" aria-hidden="true"></i>
+            </button>
+          </div>
+          <div class="p-6">
+            <div class="mb-6">
+              <h4 class="text-lg font-semibold mb-3">标题</h4>
+              <div class="bg-neutral-50 p-3 rounded-md mb-2">
+                <pre># 一级标题
+## 二级标题
+### 三级标题
+#### 四级标题</pre>
+              </div>
+              <div class="markdown-preview">
+                <h3>示例</h3>
+                <h1>一级标题</h1>
+                <h2>二级标题</h2>
+                <h3>三级标题</h3>
+              </div>
+            </div>
+            
+            <div class="mb-6">
+              <h4 class="text-lg font-semibold mb-3">文本格式</h4>
+              <div class="bg-neutral-50 p-3 rounded-md mb-2">
+                <pre>**粗体文本**
+*斜体文本*
+***粗斜体文本***
+~~删除线~~</pre>
+              </div>
+              <div class="markdown-preview">
+                <p>**粗体文本** → <strong>粗体文本</strong></p>
+                <p>*斜体文本* → <em>斜体文本</em></p>
+                <p>***粗斜体文本*** → <strong><em>粗斜体文本</em></strong></p>
+                <p>~~删除线~~ → <s>删除线</s></p>
+              </div>
+            </div>
+            
+            <div class="mb-6">
+              <h4 class="text-lg font-semibold mb-3">列表</h4>
+              <div class="bg-neutral-50 p-3 rounded-md mb-2">
+                <pre>无序列表:
+- 列表项1
+- 列表项2
+  - 子列表项
+  
+有序列表:
+1. 第一项
+2. 第二项
+   1. 子项1
+   2. 子项2</pre>
+              </div>
+              <div class="markdown-preview">
+                <h5>无序列表示例</h5>
+                <ul>
+                  <li>列表项1</li>
+                  <li>列表项2
+                    <ul>
+                      <li>子列表项</li>
+                    </ul>
+                  </li>
+                </ul>
+                
+                <h5>有序列表示例</h5>
+                <ol>
+                  <li>第一项</li>
+                  <li>第二项
+                    <ol>
+                      <li>子项1</li>
+                      <li>子项2</li>
+                    </ol>
+                  </li>
+                </ol>
+              </div>
+            </div>
+            
+            <div class="mb-6">
+              <h4 class="text-lg font-semibold mb-3">链接和图片</h4>
+              <div class="bg-neutral-50 p-3 rounded-md mb-2">
+                <pre>链接:
+[链接文本](https://example.com "可选标题")
+
+图片:
+![图片描述](https://picsum.photos/200/100)</pre>
+              </div>
+              <div class="markdown-preview">
+                <p>链接示例: <a href="#" target="_blank">链接文本</a></p>
+                <p>图片示例: <img src="https://picsum.photos/200/100" alt="图片描述"></p>
+              </div>
+            </div>
+            
+            <div class="mb-6">
+              <h4 class="text-lg font-semibold mb-3">代码</h4>
+              <div class="bg-neutral-50 p-3 rounded-md mb-2">
+                <pre>行内代码: `const x = 10;`
+
+代码块:function hello() {
+  console.log("Hello World");
+}              </div>
+              <div class="markdown-preview">
+                <p>行内代码示例: <code>const x = 10;</code></p>
+                <p>代码块示例:</p>
+                <pre><code class="language-javascript">function hello() {
+  console.log("Hello World");
+}</code></pre>
+              </div>
+            </div>
+            
+            <div class="mb-6">
+              <h4 class="text-lg font-semibold mb-3">LaTeX公式</h4>
+              <div class="bg-neutral-50 p-3 rounded-md mb-2">
+                <pre>内联公式: $E = mc^2$
+
+块级公式:
+$$
+\sum_{i=1}^n i = \frac{n(n+1)}{2}
+$$</pre>
+              </div>
+              <div class="markdown-preview">
+                <p>内联公式示例: $E = mc^2$</p>
+                <p>块级公式示例:</p>
+                <p>$$\sum_{i=1}^n i = \frac{n(n+1)}{2}$$</p>
+              </div>
+              <script>renderMathInElement(document.querySelector('#helpModal .markdown-preview'), {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});</script>
+            </div>
+          </div>
         </div>
       </div>
       
@@ -571,7 +759,7 @@
               <i class="fa fa-times text-xl" aria-hidden="true"></i>
             </button>
           </div>
-          <div id="previewContent" class="p-6">
+          <div id="previewContent" class="p-6 markdown-preview">
             <!-- 预览内容将通过JavaScript动态生成 -->
           </div>
         </div>
@@ -661,7 +849,7 @@
                   热爱技术与生活的创作者，致力于分享有价值的思考和经验。
                 </p>
                 <p class="text-neutral-600 mb-4">
-                  这个博客是我记录成长、分享见解的空间，内容涵盖技术、生活、阅读等多个领域。希望通过文字与更多志同道合的朋友交流。
+                  这个博客支持Markdown编辑和LaTeX数学公式，特别适合分享技术文章和学术内容。希望通过文字与更多志同道合的朋友交流。
                 </p>
                 <div class="flex gap-4 mt-6">
                   <a href="#" class="text-neutral-600 hover:text-orange transition-colors text-xl">
@@ -688,7 +876,7 @@
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
         <div>
           <h3 class="text-xl font-bold mb-4 text-orange">大柯的blog</h3>
-          <p class="text-neutral-400 mb-4">分享技术、生活与思考的个人博客，记录成长的点滴。</p>
+          <p class="text-neutral-400 mb-4">支持Markdown和LaTeX的个人博客，分享技术、生活与思考，记录成长的点滴。</p>
           <div class="flex gap-4">
             <a href="#" class="text-neutral-400 hover:text-orange transition-colors text-lg">
               <i class="fa fa-github" aria-hidden="true"></i>
@@ -739,7 +927,7 @@
     <i class="fa fa-arrow-up" aria-hidden="true"></i>
   </button>
 
-  <!-- 通知提示 - 修复完全移出屏幕的问题 -->
+  <!-- 通知提示 -->
   <div id="notification" class="fixed top-6 right-6 bg-white shadow-lg rounded-lg p-4 max-w-xs transform translate-x-[calc(100%+20px)] transition-transform duration-300 z-50 flex items-start gap-3">
     <div id="notificationIcon" class="text-green-500 mt-0.5">
       <i class="fa fa-check-circle text-xl" aria-hidden="true"></i>
@@ -762,6 +950,8 @@
     let selectedArticleIds = [];
     let articleToDelete = null;
     let allArticles = []; // 存储所有文章用于导航
+    let currentArticleId = null; // 跟踪当前阅读的文章ID
+    let currentEditMode = 'markdown'; // markdown, preview, split
     
     // 页面加载完成后执行
     document.addEventListener('DOMContentLoaded', function() {
@@ -771,6 +961,13 @@
       initEventListeners();
       // 设置默认排序
       document.querySelector(`.sort-btn[data-sort="${currentSort}"]`).classList.add('active');
+      // 初始化LaTeX渲染
+      renderMathInElement(document.body, {
+        delimiters: [
+          {left: '$$', right: '$$', display: true},
+          {left: '$', right: '$', display: false}
+        ]
+      });
     });
     
     // 从JSON文件加载文章
@@ -781,7 +978,7 @@
       fetch('https://catigeru.github.io/passage.json', {
         headers: {
           'Accept': 'application/json',
-          'Accept-Charset': 'utf-8' // 确保用UTF-8编码接收
+          'Accept-Charset': 'utf-8'
         }
       })
       .then(response => {
@@ -821,7 +1018,7 @@
       return allArticles;
     }
     
-    // 保存文章 - 使用GitHub API
+    // 保存文章
     function saveArticle(article) {
       // 显示加载状态
       showNotification('处理中', article.id ? '正在更新文章...' : '正在发布文章...', false);
@@ -838,15 +1035,14 @@
         article.id = Date.now(); // 使用时间戳作为唯一ID
         article.date = new Date().toISOString().split('T')[0]; // 格式化为YYYY-MM-DD
         // 估算阅读时间（假设每分钟阅读200字）
-        const wordCount = article.content.replace(/<[^>]*>/g, '').length;
+        const wordCount = article.content.replace(/[#*`\[\](){}]/g, '').length;
         article.readTime = Math.ceil(wordCount / 200);
         if (article.readTime < 1) article.readTime = 1;
         
         updatedArticles = [article, ...articles]; // 添加到数组开头
       }
       
-      // 这里应该是调用GitHub API更新passage.json的代码
-      // 为了演示，我们直接更新本地数据并显示成功消息
+      // 更新本地数据
       allArticles = updatedArticles;
       
       // 模拟API请求延迟
@@ -911,6 +1107,19 @@
       // 默认封面图
       const defaultCover = `https://picsum.photos/600/400?random=${article.id % 10}`;
       
+      // 处理摘要 - 移除Markdown标记和LaTeX公式
+      let summary = article.content
+        .replace(/#{1,6}\s+/g, '') // 移除标题标记
+        .replace(/\*\*|__/g, '') // 移除粗体标记
+        .replace(/\*|_/g, '') // 移除斜体标记
+        .replace(/`[^`]+`/g, '') // 移除代码标记
+        .replace(/>/g, '') // 移除引用标记
+        .replace(/\$\$[^$]+\$\$/g, '') // 移除块级LaTeX
+        .replace(/\$[^$]+\$/g, '') // 移除行内LaTeX
+        .replace(/!\[.*?\]\(.*?\)/g, '') // 移除图片标记
+        .replace(/\[(.*?)\]\(.*?\)/g, '$1') // 移除链接标记保留文本
+        .substring(0, 150);
+      
       card.innerHTML = `
         <div class="h-48 overflow-hidden">
           <img src="${article.cover || defaultCover}" alt="${article.title}" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110 opacity-0 transition-opacity duration-500">
@@ -925,7 +1134,7 @@
             <a href="#" class="read-article" data-id="${article.id}">${article.title}</a>
           </h3>
           <p class="text-neutral-600 mb-4 line-clamp-3">
-            ${article.content.replace(/<[^>]*>/g, '').substring(0, 150)}...
+            ${summary}...
           </p>
           <div class="flex justify-between items-center">
             <a href="#" class="inline-flex items-center text-orange font-medium hover:underline read-article" data-id="${article.id}">
@@ -965,12 +1174,26 @@
         return;
       }
       
+      // 更新当前文章ID
+      currentArticleId = articleId;
+      
       // 填充文章内容
       document.getElementById('articleReadTitle').textContent = article.title;
       document.getElementById('articleReadCategory').textContent = article.category;
       document.getElementById('articleReadDate').innerHTML = `<i class="fa fa-calendar-o mr-1" aria-hidden="true"></i> ${article.date}`;
       document.getElementById('articleReadTime').innerHTML = `<i class="fa fa-clock-o mr-1" aria-hidden="true"></i> ${article.readTime}分钟阅读`;
-      document.getElementById('articleReadContent').innerHTML = article.content;
+      
+      // 渲染Markdown和LaTeX
+      const contentElement = document.getElementById('articleReadContent');
+      contentElement.innerHTML = marked.parse(article.content);
+      
+      // 渲染LaTeX公式
+      renderMathInElement(contentElement, {
+        delimiters: [
+          {left: '$$', right: '$$', display: true},
+          {left: '$', right: '$', display: false}
+        ]
+      });
       
       // 设置封面图
       const coverImg = document.getElementById('articleReadCover');
@@ -983,32 +1206,7 @@
       document.querySelector('.delete-article[data-id=""]').setAttribute('data-id', article.id);
       
       // 处理上下篇导航
-      const sortedArticles = sortArticles([...articles], 'newest');
-      const currentIndex = sortedArticles.findIndex(a => a.id === articleId);
-      
-      // 上一篇
-      const prevArticleContainer = document.getElementById('prevArticleContainer');
-      const prevArticleTitle = document.getElementById('prevArticleTitle');
-      if (currentIndex < sortedArticles.length - 1) {
-        const prevArticle = sortedArticles[currentIndex + 1];
-        prevArticleTitle.textContent = prevArticle.title;
-        prevArticleContainer.classList.remove('hidden');
-        document.querySelector('.prev-article-link').setAttribute('data-id', prevArticle.id);
-      } else {
-        prevArticleContainer.classList.add('hidden');
-      }
-      
-      // 下一篇
-      const nextArticleContainer = document.getElementById('nextArticleContainer');
-      const nextArticleTitle = document.getElementById('nextArticleTitle');
-      if (currentIndex > 0) {
-        const nextArticle = sortedArticles[currentIndex - 1];
-        nextArticleTitle.textContent = nextArticle.title;
-        nextArticleContainer.classList.remove('hidden');
-        document.querySelector('.next-article-link').setAttribute('data-id', nextArticle.id);
-      } else {
-        nextArticleContainer.classList.add('hidden');
-      }
+      updateArticleNavigation(articleId);
       
       // 切换到阅读页面
       document.querySelectorAll('.page-content').forEach(pageEl => {
@@ -1021,6 +1219,44 @@
         top: 0,
         behavior: 'smooth'
       });
+    }
+    
+    // 更新文章导航（上一篇/下一篇）
+    function updateArticleNavigation(currentId) {
+      const articles = getArticles();
+      // 按日期排序文章（最新在前）
+      const sortedArticles = sortArticles([...articles], 'newest');
+      const currentIndex = sortedArticles.findIndex(a => a.id === currentId);
+      
+      // 上一篇
+      const prevArticleContainer = document.getElementById('prevArticleContainer');
+      const prevArticleTitle = document.getElementById('prevArticleTitle');
+      const prevArticleLink = document.querySelector('.prev-article-link');
+      
+      if (currentIndex < sortedArticles.length - 1) {
+        const prevArticle = sortedArticles[currentIndex + 1];
+        prevArticleTitle.textContent = prevArticle.title;
+        prevArticleLink.setAttribute('data-id', prevArticle.id);
+        prevArticleContainer.classList.remove('hidden');
+      } else {
+        prevArticleContainer.classList.add('hidden');
+        prevArticleLink.setAttribute('data-id', '');
+      }
+      
+      // 下一篇
+      const nextArticleContainer = document.getElementById('nextArticleContainer');
+      const nextArticleTitle = document.getElementById('nextArticleTitle');
+      const nextArticleLink = document.querySelector('.next-article-link');
+      
+      if (currentIndex > 0) {
+        const nextArticle = sortedArticles[currentIndex - 1];
+        nextArticleTitle.textContent = nextArticle.title;
+        nextArticleLink.setAttribute('data-id', nextArticle.id);
+        nextArticleContainer.classList.remove('hidden');
+      } else {
+        nextArticleContainer.classList.add('hidden');
+        nextArticleLink.setAttribute('data-id', '');
+      }
     }
     
     // 加载文章到管理页面
@@ -1042,7 +1278,7 @@
         articles = articles.filter(article => 
           article.title.toLowerCase().includes(query) || 
           article.category.toLowerCase().includes(query) ||
-          article.content.replace(/<[^>]*>/g, '').toLowerCase().includes(query)
+          article.content.toLowerCase().includes(query)
         );
       }
       
@@ -1152,7 +1388,7 @@
       document.getElementById('thoughtCount').textContent = counts['思考'];
     }
     
-    // 显示通知 - 修复了完全移出屏幕的问题
+    // 显示通知
     function showNotification(title, message, isError = false) {
       const notification = document.getElementById('notification');
       const notificationTitle = document.getElementById('notificationTitle');
@@ -1171,14 +1407,16 @@
         notificationIcon.innerHTML = '<i class="fa fa-check-circle text-xl" aria-hidden="true"></i>';
       }
       
-      // 显示通知 - 使用计算属性确保完全移出
+      // 显示通知
       notification.style.transform = 'translateX(0)';
+      
+      // 3秒后自动隐藏
+      setTimeout(hideNotification, 3000);
     }
     
     // 隐藏通知
     function hideNotification() {
       const notification = document.getElementById('notification');
-      // 确保通知完全移出屏幕
       notification.style.transform = 'translateX(calc(100% + 20px))';
     }
     
@@ -1236,6 +1474,71 @@
         
         showNotification('成功', `已删除 ${ids.length} 篇文章`);
       }, 800);
+    }
+    
+    // 切换编辑模式
+    function switchEditMode(mode) {
+      currentEditMode = mode;
+      
+      // 更新按钮状态
+      document.querySelectorAll('.edit-mode-tabs button').forEach(btn => {
+        btn.classList.remove('active', 'bg-orange', 'text-white');
+        btn.classList.add('text-neutral-600');
+      });
+      
+      const activeBtn = mode === 'markdown' ? '#markdownModeBtn' : 
+                       mode === 'preview' ? '#previewModeBtn' : '#splitModeBtn';
+      document.querySelector(activeBtn).classList.add('active', 'bg-orange', 'text-white');
+      document.querySelector(activeBtn).classList.remove('text-neutral-600');
+      
+      // 隐藏所有编辑区域
+      document.getElementById('markdownEditor').classList.add('hidden');
+      document.getElementById('previewArea').classList.add('hidden');
+      document.getElementById('splitEditor').classList.add('hidden');
+      
+      // 显示选中的编辑区域
+      if (mode === 'markdown') {
+        document.getElementById('markdownEditor').classList.remove('hidden');
+      } else if (mode === 'preview') {
+        document.getElementById('previewArea').classList.remove('hidden');
+        updatePreview();
+      } else if (mode === 'split') {
+        document.getElementById('splitEditor').classList.remove('hidden');
+        // 同步内容
+        document.getElementById('splitArticleContent').value = 
+          document.getElementById('articleContent').value;
+        updateSplitPreview();
+      }
+    }
+    
+    // 更新预览内容
+    function updatePreview() {
+      const content = document.getElementById('articleContent').value;
+      const previewArea = document.getElementById('previewArea');
+      previewArea.innerHTML = marked.parse(content || '<p>无内容</p>');
+      
+      // 渲染LaTeX公式
+      renderMathInElement(previewArea, {
+        delimiters: [
+          {left: '$$', right: '$$', display: true},
+          {left: '$', right: '$', display: false}
+        ]
+      });
+    }
+    
+    // 更新分屏预览
+    function updateSplitPreview() {
+      const content = document.getElementById('splitArticleContent').value;
+      const previewArea = document.getElementById('splitPreviewArea');
+      previewArea.innerHTML = marked.parse(content || '<p>无内容</p>');
+      
+      // 渲染LaTeX公式
+      renderMathInElement(previewArea, {
+        delimiters: [
+          {left: '$$', right: '$$', display: true},
+          {left: '$', right: '$', display: false}
+        ]
+      });
     }
     
     // 初始化事件监听
@@ -1317,12 +1620,19 @@
         e.preventDefault();
         
         // 获取表单数据
+        let content;
+        if (currentEditMode === 'split') {
+          content = document.getElementById('splitArticleContent').value;
+        } else {
+          content = document.getElementById('articleContent').value;
+        }
+        
         const article = {
           id: document.getElementById('articleId').value ? parseInt(document.getElementById('articleId').value) : null,
           title: document.getElementById('articleTitle').value,
           category: document.getElementById('articleCategory').value,
           cover: document.getElementById('articleCover').value,
-          content: document.getElementById('articleContent').innerHTML
+          content: content
         };
         
         // 验证表单
@@ -1351,8 +1661,11 @@
       function resetArticleForm() {
         document.getElementById('articleForm').reset();
         document.getElementById('articleId').value = '';
-        document.getElementById('articleContent').innerHTML = '';
+        document.getElementById('articleContent').value = '';
+        document.getElementById('splitArticleContent').value = '';
         document.getElementById('submitBtnText').textContent = '发布文章';
+        // 切换到Markdown编辑模式
+        switchEditMode('markdown');
       }
       
       // 取消编辑按钮
@@ -1383,101 +1696,265 @@
         });
       });
       
-      // 编辑器工具栏
+      // 编辑模式切换
+      document.getElementById('markdownModeBtn').addEventListener('click', () => {
+        // 同步内容
+        if (currentEditMode === 'split') {
+          document.getElementById('articleContent').value = 
+            document.getElementById('splitArticleContent').value;
+        }
+        switchEditMode('markdown');
+      });
+      
+      document.getElementById('previewModeBtn').addEventListener('click', () => {
+        // 同步内容
+        if (currentEditMode === 'split') {
+          document.getElementById('articleContent').value = 
+            document.getElementById('splitArticleContent').value;
+        }
+        switchEditMode('preview');
+      });
+      
+      document.getElementById('splitModeBtn').addEventListener('click', () => {
+        // 同步内容
+        document.getElementById('splitArticleContent').value = 
+          document.getElementById('articleContent').value;
+        switchEditMode('split');
+      });
+      
+      // 分屏编辑区内容变化时更新预览
+      document.getElementById('splitArticleContent').addEventListener('input', updateSplitPreview);
+      
+      // 编辑器工具栏 - Markdown功能
       document.querySelectorAll('.editor-toolbar button').forEach(button => {
         button.addEventListener('click', function() {
           const action = this.getAttribute('data-action');
-          const content = document.getElementById('articleContent');
+          let textarea, start, end, selectedText;
           
-          // 确保内容区获得焦点
-          content.focus();
+          // 根据当前编辑模式选择正确的textarea
+          if (currentEditMode === 'split') {
+            textarea = document.getElementById('splitArticleContent');
+          } else {
+            textarea = document.getElementById('articleContent');
+          }
+          
+          // 确保textarea获得焦点
+          textarea.focus();
+          
+          // 获取选中的文本和位置
+          start = textarea.selectionStart;
+          end = textarea.selectionEnd;
+          selectedText = textarea.value.substring(start, end);
+          
+          let newText, newCursorPos;
           
           switch (action) {
+            case 'heading1':
+              newText = `# ${selectedText || '一级标题'}`;
+              newCursorPos = start + (selectedText ? newText.length : 4);
+              break;
+            case 'heading2':
+              newText = `## ${selectedText || '二级标题'}`;
+              newCursorPos = start + (selectedText ? newText.length : 5);
+              break;
+            case 'heading3':
+              newText = `### ${selectedText || '三级标题'}`;
+              newCursorPos = start + (selectedText ? newText.length : 6);
+              break;
             case 'bold':
-              document.execCommand('bold', false, null);
+              newText = `**${selectedText || '粗体文本'}**`;
+              newCursorPos = start + (selectedText ? newText.length : 8);
               break;
             case 'italic':
-              document.execCommand('italic', false, null);
+              newText = `*${selectedText || '斜体文本'}*`;
+              newCursorPos = start + (selectedText ? newText.length : 6);
+              break;
+            case 'strikethrough':
+              newText = `~~${selectedText || '删除线文本'}~~`;
+              newCursorPos = start + (selectedText ? newText.length : 8);
               break;
             case 'link':
-              const url = prompt('请输入链接地址:');
+              const linkText = selectedText || '链接文本';
+              const url = prompt('请输入链接地址:', 'https://');
               if (url) {
-                document.execCommand('createLink', false, url);
+                newText = `[${linkText}](${url})`;
+                newCursorPos = start + newText.length;
+              } else {
+                return; // 用户取消
               }
               break;
             case 'image':
-              const src = prompt('请输入图片URL:');
-              if (src) {
-                document.execCommand('insertImage', false, src);
+              const altText = selectedText || '图片描述';
+              const imgUrl = prompt('请输入图片URL:', 'https://');
+              if (imgUrl) {
+                newText = `![${altText}](${imgUrl})`;
+                newCursorPos = start + newText.length;
+              } else {
+                return; // 用户取消
               }
               break;
-            case 'heading':
-              document.execCommand('formatBlock', false, '<h3>');
+            case 'code':
+              newText = `\`${selectedText || '代码'}\``;
+              newCursorPos = start + (selectedText ? newText.length : 6);
               break;
-            case 'list':
-              document.execCommand('insertUnorderedList', false, null);
+            case 'quote':
+              newText = `> ${selectedText || '引用内容'}`;
+              newCursorPos = start + (selectedText ? newText.length : 4);
               break;
-            case 'clear':
-              document.execCommand('removeFormat', false, null);
+            case 'unordered-list':
+              newText = `- ${selectedText || '列表项'}`;
+              newCursorPos = start + (selectedText ? newText.length : 4);
               break;
+            case 'ordered-list':
+              newText = `1. ${selectedText || '列表项'}`;
+              newCursorPos = start + (selectedText ? newText.length : 5);
+              break;
+            case 'latex':
+              if (selectedText) {
+                newText = `$${selectedText}$`;
+              } else {
+                newText = `$公式$`;
+                newCursorPos = start + 2; // 光标放在$之间
+              }
+              newCursorPos = start + (selectedText ? newText.length : 2);
+              break;
+            case 'table':
+              newText = `| 表头1 | 表头2 | 表头3 |
+| --- | --- | --- |
+| 内容1 | 内容2 | 内容3 |
+| 内容4 | 内容5 | 内容6 |`;
+              newCursorPos = start + newText.length;
+              break;
+            case 'hr':
+              newText = `---`;
+              newCursorPos = start + 3;
+              break;
+            default:
+              return;
+          }
+          
+          // 替换选中的文本
+          textarea.value = 
+            textarea.value.substring(0, start) + 
+            newText + 
+            textarea.value.substring(end);
+          
+          // 设置光标位置
+          textarea.selectionStart = newCursorPos;
+          textarea.selectionEnd = newCursorPos;
+          
+          // 如果是预览模式或分屏模式，更新预览
+          if (currentEditMode === 'preview') {
+            updatePreview();
+          } else if (currentEditMode === 'split') {
+            updateSplitPreview();
           }
         });
       });
       
-      // 预览按钮
-      const previewBtn = document.getElementById('previewBtn');
-      const previewModal = document.getElementById('previewModal');
-      const previewContent = document.getElementById('previewContent');
-      const closePreviewBtn = document.getElementById('closePreviewBtn');
+      // 格式帮助按钮
+      const helpBtn = document.getElementById('helpBtn');
+      const helpModal = document.getElementById('helpModal');
+      const closeHelpBtn = document.getElementById('closeHelpBtn');
       
-      previewBtn.addEventListener('click', function() {
-        const title = document.getElementById('articleTitle').value || '未命名文章';
-        const category = document.getElementById('articleCategory').value || '未分类';
-        const content = document.getElementById('articleContent').innerHTML || '<p>无内容</p>';
-        const cover = document.getElementById('articleCover').value || `https://picsum.photos/600/400?random=99`;
-        
-        previewContent.innerHTML = `
-          <div class="mb-6">
-            <span class="bg-orange-light text-orange px-2 py-1 rounded-full text-sm">${category}</span>
-          </div>
-          <h1 class="text-3xl font-bold mb-6">${title}</h1>
-          <div class="mb-8">
-            <img src="${cover}" alt="文章封面" class="w-full h-64 object-cover rounded-lg">
-          </div>
-          <div class="prose max-w-none">
-            ${content}
-          </div>
-        `;
-        
-        previewModal.classList.remove('hidden');
+      helpBtn.addEventListener('click', function() {
+        helpModal.classList.remove('hidden');
       });
       
-      closePreviewBtn.addEventListener('click', function() {
-        previewModal.classList.add('hidden');
+      closeHelpBtn.addEventListener('click', function() {
+        helpModal.classList.add('hidden');
       });
       
-      // 点击模态框外部关闭
-      previewModal.addEventListener('click', function(e) {
-        if (e.target === previewModal) {
-          previewModal.classList.add('hidden');
+      // 点击帮助模态框外部关闭
+      helpModal.addEventListener('click', function(e) {
+        if (e.target === helpModal) {
+          helpModal.classList.add('hidden');
         }
       });
       
       // 关闭通知
       document.getElementById('closeNotification').addEventListener('click', hideNotification);
       
-      // 文章网格事件委托 - 处理编辑、删除和阅读
-      document.getElementById('articlesGrid').addEventListener('click', function(e) {
-        handleArticleActions(e);
-      });
-      
-      // 管理页面表格事件委托 - 处理编辑、删除和阅读
-      document.getElementById('manageArticlesTable').addEventListener('click', function(e) {
-        handleArticleActions(e);
-      });
-      
-      // 文章阅读页面事件委托 - 处理编辑、删除和导航
-      document.getElementById('articlePage').addEventListener('click', function(e) {
+      // 全局事件委托 - 处理所有动态生成的文章相关操作
+      document.addEventListener('click', function(e) {
+        // 阅读文章
+        if (e.target.closest('.read-article')) {
+          e.preventDefault();
+          const link = e.target.closest('.read-article');
+          const id = parseInt(link.getAttribute('data-id'));
+          if (!isNaN(id)) {
+            loadArticleForReading(id);
+          }
+        }
+        
+        // 编辑文章
+        if (e.target.closest('.edit-article')) {
+          e.preventDefault();
+          const link = e.target.closest('.edit-article');
+          const id = parseInt(link.getAttribute('data-id'));
+          if (!isNaN(id)) {
+            const articles = getArticles();
+            const article = articles.find(a => a.id === id);
+            
+            if (article) {
+              // 填充表单
+              document.getElementById('articleId').value = article.id;
+              document.getElementById('articleTitle').value = article.title;
+              document.getElementById('articleCategory').value = article.category;
+              document.getElementById('articleCover').value = article.cover || '';
+              document.getElementById('articleContent').value = article.content;
+              document.getElementById('splitArticleContent').value = article.content;
+              document.getElementById('submitBtnText').textContent = '更新文章';
+              
+              // 切换到写文章页面
+              document.querySelectorAll('.page-content').forEach(pageEl => {
+                pageEl.classList.add('hidden');
+              });
+              document.getElementById('writePage').classList.remove('hidden');
+              
+              // 切换到Markdown编辑模式
+              switchEditMode('markdown');
+              
+              // 滚动到顶部
+              window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+              });
+            }
+          }
+        }
+        
+        // 删除文章
+        if (e.target.closest('.delete-article')) {
+          e.preventDefault();
+          const link = e.target.closest('.delete-article');
+          const id = parseInt(link.getAttribute('data-id'));
+          if (!isNaN(id)) {
+            articleToDelete = id;
+            // 显示删除确认模态框
+            document.getElementById('deleteConfirmModal').classList.remove('hidden');
+          }
+        }
+        
+        // 上一篇/下一篇导航
+        if (e.target.closest('.prev-article-link')) {
+          e.preventDefault();
+          const link = e.target.closest('.prev-article-link');
+          const id = parseInt(link.getAttribute('data-id'));
+          if (!isNaN(id)) {
+            loadArticleForReading(id);
+          }
+        }
+        
+        if (e.target.closest('.next-article-link')) {
+          e.preventDefault();
+          const link = e.target.closest('.next-article-link');
+          const id = parseInt(link.getAttribute('data-id'));
+          if (!isNaN(id)) {
+            loadArticleForReading(id);
+          }
+        }
+        
         // 返回文章列表
         if (e.target.closest('.back-to-list')) {
           e.preventDefault();
@@ -1486,73 +1963,7 @@
           });
           document.getElementById('homePage').classList.remove('hidden');
         }
-        
-        // 上一篇/下一篇导航
-        if (e.target.closest('.prev-article-link')) {
-          e.preventDefault();
-          const id = parseInt(e.target.closest('.prev-article-link').getAttribute('data-id'));
-          loadArticleForReading(id);
-        }
-        
-        if (e.target.closest('.next-article-link')) {
-          e.preventDefault();
-          const id = parseInt(e.target.closest('.next-article-link').getAttribute('data-id'));
-          loadArticleForReading(id);
-        }
-        
-        // 处理其他文章操作
-        handleArticleActions(e);
       });
-      
-      // 处理文章操作（编辑/删除/阅读）
-      function handleArticleActions(e) {
-        // 阅读文章
-        if (e.target.closest('.read-article')) {
-          e.preventDefault();
-          const id = parseInt(e.target.closest('.read-article').getAttribute('data-id'));
-          loadArticleForReading(id);
-        }
-        
-        // 编辑文章
-        if (e.target.closest('.edit-article')) {
-          e.preventDefault();
-          const id = parseInt(e.target.closest('.edit-article').getAttribute('data-id'));
-          const articles = getArticles();
-          const article = articles.find(a => a.id === id);
-          
-          if (article) {
-            // 填充表单
-            document.getElementById('articleId').value = article.id;
-            document.getElementById('articleTitle').value = article.title;
-            document.getElementById('articleCategory').value = article.category;
-            document.getElementById('articleCover').value = article.cover || '';
-            document.getElementById('articleContent').innerHTML = article.content;
-            document.getElementById('submitBtnText').textContent = '更新文章';
-            
-            // 切换到写文章页面
-            document.querySelectorAll('.page-content').forEach(pageEl => {
-              pageEl.classList.add('hidden');
-            });
-            document.getElementById('writePage').classList.remove('hidden');
-            
-            // 滚动到顶部
-            window.scrollTo({
-              top: 0,
-              behavior: 'smooth'
-            });
-          }
-        }
-        
-        // 删除文章
-        if (e.target.closest('.delete-article')) {
-          e.preventDefault();
-          const id = parseInt(e.target.closest('.delete-article').getAttribute('data-id'));
-          articleToDelete = id;
-          
-          // 显示删除确认模态框
-          document.getElementById('deleteConfirmModal').classList.remove('hidden');
-        }
-      }
       
       // 删除确认模态框操作
       document.getElementById('cancelDeleteBtn').addEventListener('click', function() {
@@ -1643,7 +2054,7 @@
       });
       
       // 文章复选框事件委托
-      document.getElementById('manageArticlesTable').addEventListener('change', function(e) {
+      document.addEventListener('change', function(e) {
         if (e.target.classList.contains('article-checkbox')) {
           // 更新全选框状态
           updateSelectAllStatus();
