@@ -10,6 +10,13 @@
   <!-- 引入Font Awesome -->
   <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
   
+  <!-- 新增：Markdown解析库 (marked.js) -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <!-- 新增：LaTeX渲染库 (KaTeX) + 样式 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  
   <!-- 配置Tailwind自定义颜色和字体 -->
   <script>
     tailwind.config = {
@@ -114,6 +121,8 @@
     /* 编辑器样式 */
     .editor-toolbar button {
       transition: all 0.2s ease;
+      padding: 4px 8px;
+      border-radius: 4px;
     }
     
     .editor-toolbar button:hover {
@@ -124,6 +133,82 @@
     .editor-content:focus {
       outline: none;
       box-shadow: 0 0 0 2px rgba(255, 152, 0, 0.3);
+    }
+    
+    /* Markdown编辑器内容区样式 */
+    .editor-content {
+      white-space: pre-wrap;
+      line-height: 1.6;
+    }
+    
+    /* Markdown渲染样式（文章展示用） */
+    .markdown-render h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin: 1.5rem 0 1rem;
+      color: #212121;
+    }
+    
+    .markdown-render h2 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin: 1.2rem 0 0.8rem;
+      color: #212121;
+    }
+    
+    .markdown-render p {
+      margin: 0.8rem 0;
+      line-height: 1.8;
+    }
+    
+    .markdown-render ul, .markdown-render ol {
+      margin: 0.8rem 0 0.8rem 1.5rem;
+      line-height: 1.8;
+    }
+    
+    .markdown-render blockquote {
+      border-left: 4px solid #FF9800;
+      padding: 0.5rem 1rem;
+      margin: 1rem 0;
+      background-color: #FFF8E1;
+      border-radius: 0 4px 4px 0;
+    }
+    
+    .markdown-render code {
+      background-color: #F5F5F5;
+      padding: 2px 4px;
+      border-radius: 4px;
+      font-family: 'Consolas', monospace;
+      font-size: 0.9rem;
+    }
+    
+    .markdown-render pre {
+      background-color: #F5F5F5;
+      padding: 1rem;
+      border-radius: 4px;
+      overflow-x: auto;
+      margin: 1rem 0;
+    }
+    
+    .markdown-render pre code {
+      padding: 0;
+      background: transparent;
+    }
+    
+    .markdown-render a {
+      color: #FF9800;
+      text-decoration: underline;
+      transition: color 0.2s;
+    }
+    
+    .markdown-render a:hover {
+      color: #E65100;
+    }
+    
+    .markdown-render img {
+      max-width: 100%;
+      border-radius: 4px;
+      margin: 1rem 0;
     }
     
     /* 管理表格样式 */
@@ -264,6 +349,10 @@
               <i class="fa fa-arrow-left" aria-hidden="true"></i> 返回首页
             </a>
             <h2 class="text-2xl font-bold">写文章</h2>
+            <!-- 新增：语法提示 -->
+            <div class="ml-auto text-sm text-neutral-500">
+              <i class="fa fa-info-circle mr-1"></i> 支持Markdown和LaTeX（$公式$ 或 $$块级公式$$）
+            </div>
           </div>
           
           <form id="articleForm" class="bg-white rounded-xl shadow-md p-6 md:p-8">
@@ -299,36 +388,64 @@
             </div>
             
             <div class="mb-6">
-              <label class="block text-neutral-700 font-medium mb-2">内容编辑</label>
+              <label class="block text-neutral-700 font-medium mb-2">内容编辑（支持Markdown/LaTeX）</label>
               
-              <!-- 编辑器工具栏 -->
+              <!-- 新增：Markdown+LaTeX工具栏 -->
               <div class="editor-toolbar flex flex-wrap gap-2 p-3 bg-neutral-100 rounded-t-lg border border-b-0 border-neutral-300">
-                <button type="button" data-action="bold" title="加粗">
+                <!-- 标题 -->
+                <button type="button" data-action="h1" title="一级标题 (# 标题)">
+                  <i class="fa fa-header" aria-hidden="true"></i> 1
+                </button>
+                <button type="button" data-action="h2" title="二级标题 (## 标题)">
+                  <i class="fa fa-header" aria-hidden="true"></i> 2
+                </button>
+                <!-- 文本格式 -->
+                <button type="button" data-action="bold" title="粗体 (**文本**)">
                   <i class="fa fa-bold" aria-hidden="true"></i>
                 </button>
-                <button type="button" data-action="italic" title="斜体">
+                <button type="button" data-action="italic" title="斜体 (*文本*)">
                   <i class="fa fa-italic" aria-hidden="true"></i>
                 </button>
-                <button type="button" data-action="link" title="插入链接">
-                  <i class="fa fa-link" aria-hidden="true"></i>
+                <button type="button" data-action="strike" title="删除线 (~~文本~~)">
+                  <i class="fa fa-strikethrough" aria-hidden="true"></i>
                 </button>
-                <button type="button" data-action="image" title="插入图片">
-                  <i class="fa fa-image" aria-hidden="true"></i>
-                </button>
-                <button type="button" data-action="heading" title="标题">
-                  <i class="fa fa-header" aria-hidden="true"></i>
-                </button>
-                <button type="button" data-action="list" title="列表">
+                <!-- 列表 -->
+                <button type="button" data-action="ul" title="无序列表 (- 项)">
                   <i class="fa fa-list-ul" aria-hidden="true"></i>
                 </button>
+                <button type="button" data-action="ol" title="有序列表 (1. 项)">
+                  <i class="fa fa-list-ol" aria-hidden="true"></i>
+                </button>
+                <!-- 引用/代码 -->
+                <button type="button" data-action="quote" title="引用 (> 内容)">
+                  <i class="fa fa-quote-left" aria-hidden="true"></i>
+                </button>
+                <button type="button" data-action="code" title="代码块 (```)">
+                  <i class="fa fa-code" aria-hidden="true"></i>
+                </button>
+                <!-- 链接/图片 -->
+                <button type="button" data-action="link" title="链接 ([文本](url))">
+                  <i class="fa fa-link" aria-hidden="true"></i>
+                </button>
+                <button type="button" data-action="image" title="图片 (![alt](url))">
+                  <i class="fa fa-image" aria-hidden="true"></i>
+                </button>
+                <!-- LaTeX公式 -->
+                <button type="button" data-action="latex-inline" title="内联公式 ($公式$)">
+                  <i class="fa fa-square-root-o" aria-hidden="true"></i> 内联
+                </button>
+                <button type="button" data-action="latex-block" title="块级公式 ($$公式$$)">
+                  <i class="fa fa-square-root-o" aria-hidden="true"></i> 块级
+                </button>
+                <!-- 清除格式 -->
                 <button type="button" data-action="clear" title="清除格式">
                   <i class="fa fa-eraser" aria-hidden="true"></i>
                 </button>
               </div>
               
-              <!-- 编辑器内容区 -->
+              <!-- 编辑器内容区（存储Markdown文本） -->
               <div id="articleContent" class="editor-content w-full min-h-[300px] px-4 py-3 rounded-b-lg border border-neutral-300 focus:outline-none"
-                   contenteditable="true" placeholder="开始撰写文章内容..."></div>
+                   contenteditable="true" placeholder="输入Markdown内容，支持LaTeX公式（如 $E=mc^2$ 或 $$\sum_{i=1}^n x_i$$）..."></div>
             </div>
             
             <div class="flex justify-end gap-4">
@@ -541,7 +658,7 @@
                   热爱技术与生活的创作者，致力于分享有价值的思考和经验。
                 </p>
                 <p class="text-neutral-600 mb-4">
-                  这个博客是我记录成长、分享见解的空间，内容涵盖技术、生活、阅读等多个领域。希望通过文字与更多志同道合的朋友交流。
+                  这个博客是我记录成长、分享见解的空间，内容涵盖技术、生活、阅读等多个领域。支持Markdown和LaTeX语法，方便分享技术笔记和数学推导。
                 </p>
                 <div class="flex gap-4 mt-6">
                   <a href="#" class="text-neutral-600 hover:text-orange transition-colors text-xl">
@@ -568,7 +685,7 @@
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
         <div>
           <h3 class="text-xl font-bold mb-4 text-orange">大柯的blog</h3>
-          <p class="text-neutral-400 mb-4">分享技术、生活与思考的个人博客，记录成长的点滴。</p>
+          <p class="text-neutral-400 mb-4">分享技术、生活与思考的个人博客，支持Markdown和LaTeX语法，记录成长的点滴。</p>
           <div class="flex gap-4">
             <a href="#" class="text-neutral-400 hover:text-orange transition-colors text-lg">
               <i class="fa fa-github" aria-hidden="true"></i>
@@ -609,7 +726,7 @@
       </div>
       
       <div class="border-t border-neutral-700 pt-8 text-center text-neutral-500 text-sm">
-        <p>&copy; 2023 大柯的blog. 保留所有权利。</p>
+        <p>&copy; 2023 大柯的blog. 保留所有权利。支持Markdown和LaTeX语法</p>
       </div>
     </div>
   </footer>
@@ -726,8 +843,9 @@
         // 添加新文章
         article.id = Date.now(); // 使用时间戳作为唯一ID
         article.date = new Date().toISOString().split('T')[0]; // 格式化为YYYY-MM-DD
-        // 估算阅读时间（假设每分钟阅读200字）
-        const wordCount = article.content.replace(/<[^>]*>/g, '').length;
+        // 估算阅读时间（假设每分钟阅读200字，排除Markdown语法标记）
+        const pureText = article.content.replace(/[#*`~$\[\](){}<>!-]/g, '').replace(/https?:\/\/\S+/g, '');
+        const wordCount = pureText.length;
         article.readTime = Math.ceil(wordCount / 200);
         if (article.readTime < 1) article.readTime = 1;
         
@@ -772,7 +890,7 @@
       });
     }
     
-    // 加载文章到首页
+    // 加载文章到首页（支持Markdown+LaTeX渲染）
     function loadArticles(category = 'all') {
       const articlesGrid = document.getElementById('articlesGrid');
       const noArticles = document.getElementById('noArticles');
@@ -806,17 +924,35 @@
           const articleCard = createArticleCard(article);
           articleCard.classList.add('fade-in', 'slide-up');
           articlesGrid.appendChild(articleCard);
+          
+          // 渲染卡片中的LaTeX公式
+          renderMathInElement(articleCard, {
+            delimiters: [
+              { left: '$$', right: '$$', display: true },
+              { left: '$', right: '$', display: false },
+              { left: '\\(', right: '\\)', display: false },
+              { left: '\\[', right: '\\]', display: true }
+            ],
+            throwOnError: false
+          });
         }, index * 100);
       });
     }
     
-    // 创建文章卡片
+    // 创建文章卡片（支持Markdown预览）
     function createArticleCard(article) {
       const card = document.createElement('article');
       card.className = 'bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl card-hover';
       
       // 默认封面图
       const defaultCover = `https://picsum.photos/600/400?random=${article.id % 10}`;
+      
+      // Markdown转为预览文本（截取前150字，排除HTML标签）
+      marked.setOptions({ sanitize: true, breaks: true });
+      const htmlPreview = marked.parse(article.content || '').replace(/<[^>]*>/g, '');
+      const textPreview = htmlPreview.length > 150 
+        ? htmlPreview.substring(0, 150) + '...' 
+        : htmlPreview;
       
       card.innerHTML = `
         <div class="h-48 overflow-hidden">
@@ -831,8 +967,8 @@
           <h3 class="text-xl font-bold mb-3 hover:text-orange transition-colors">
             <a href="#">${article.title}</a>
           </h3>
-          <p class="text-neutral-600 mb-4 line-clamp-3">
-            ${article.content.replace(/<[^>]*>/g, '').substring(0, 150)}...
+          <p class="text-neutral-600 mb-4 line-clamp-3 markdown-render">
+            ${textPreview}
           </p>
           <div class="flex justify-between items-center">
             <a href="#" class="inline-flex items-center text-orange font-medium hover:underline">
@@ -881,7 +1017,7 @@
         filteredArticles = filteredArticles.filter(article => 
           article.title.toLowerCase().includes(query) || 
           article.category.toLowerCase().includes(query) ||
-          article.content.replace(/<[^>]*>/g, '').toLowerCase().includes(query)
+          article.content.replace(/[#*`~$\[\](){}]/g, '').toLowerCase().includes(query)
         );
       }
       
@@ -1011,6 +1147,9 @@
       
       // 显示通知
       notification.classList.remove('translate-x-full');
+      
+      // 3秒后自动隐藏
+      setTimeout(hideNotification, 3000);
     }
     
     // 隐藏通知
@@ -1222,380 +1361,23 @@
         });
       });
       
-      // 文章表单提交
+      // 文章表单提交（存储Markdown文本）
       const articleForm = document.getElementById('articleForm');
       
       articleForm.addEventListener('submit', function(e) {
         e.preventDefault();
         
-        // 获取表单数据
+        // 获取Markdown文本（保留原始格式）
+        const editorContent = document.getElementById('articleContent');
+        const markdownContent = editorContent.innerText
+          .replace(/\n{3,}/g, '\n\n') // 最多保留2个连续换行（Markdown标准）
+          .replace(/\t/g, '  '); // 制表符转为2个空格
+        
+        // 组装文章数据
         const article = {
           id: document.getElementById('articleId').value ? parseInt(document.getElementById('articleId').value) : null,
           title: document.getElementById('articleTitle').value,
           category: document.getElementById('articleCategory').value,
           cover: document.getElementById('articleCover').value,
-          content: document.getElementById('articleContent').innerHTML
-        };
-        
-        // 验证表单
-        if (!article.title || !article.category || !article.content.trim()) {
-          showNotification('错误', '请填写标题、分类和内容', true);
-          return;
-        }
-        
-        // 显示加载状态
-        showNotification('保存中', '正在保存文章...', false);
-        
-        // 保存文章到GitHub
-        saveArticleToGitHub(article)
-          .then(savedArticle => {
-            // 重置表单
-            resetArticleForm();
-            
-            // 显示成功通知
-            showNotification('成功', article.id ? '文章已更新' : '文章已发布');
-            
-            // 切换到首页
-            document.querySelectorAll('.page-content').forEach(pageEl => {
-              pageEl.classList.add('hidden');
-            });
-            document.getElementById('homePage').classList.remove('hidden');
-            
-            // 重新加载文章列表
-            loadArticles();
-            loadManageArticles();
-            // 更新分类统计
-            updateCategoryCounts();
-          })
-          .catch(error => {
-            console.error('保存文章失败:', error);
-            showNotification('错误', '保存文章失败，请稍后重试', true);
-          });
-      });
-      
-      // 重置文章表单
-      function resetArticleForm() {
-        document.getElementById('articleForm').reset();
-        document.getElementById('articleId').value = '';
-        document.getElementById('articleContent').innerHTML = '';
-        document.getElementById('submitBtnText').textContent = '发布文章';
-      }
-      
-      // 取消编辑按钮
-      document.getElementById('cancelEditBtn').addEventListener('click', function() {
-        resetArticleForm();
-        
-        // 切换到首页
-        document.querySelectorAll('.page-content').forEach(pageEl => {
-          pageEl.classList.add('hidden');
-        });
-        document.getElementById('homePage').classList.remove('hidden');
-      });
-      
-      // 分类筛选
-      document.querySelectorAll('.category-filter').forEach(button => {
-        button.addEventListener('click', function() {
-          // 更新按钮样式
-          document.querySelectorAll('.category-filter').forEach(btn => {
-            btn.classList.remove('bg-orange', 'text-white');
-            btn.classList.add('bg-white', 'border', 'border-neutral-300', 'hover:border-orange', 'hover:text-orange');
-          });
-          this.classList.remove('bg-white', 'border', 'border-neutral-300', 'hover:border-orange', 'hover:text-orange');
-          this.classList.add('bg-orange', 'text-white');
-          
-          // 加载对应分类的文章
-          const category = this.getAttribute('data-category');
-          loadArticles(category);
-        });
-      });
-      
-      // 编辑器工具栏
-      document.querySelectorAll('.editor-toolbar button').forEach(button => {
-        button.addEventListener('click', function() {
-          const action = this.getAttribute('data-action');
-          const content = document.getElementById('articleContent');
-          
-          // 确保内容区获得焦点
-          content.focus();
-          
-          switch (action) {
-            case 'bold':
-              document.execCommand('bold', false, null);
-              break;
-            case 'italic':
-              document.execCommand('italic', false, null);
-              break;
-            case 'link':
-              const url = prompt('请输入链接地址:');
-              if (url) {
-                document.execCommand('createLink', false, url);
-              }
-              break;
-            case 'image':
-              const src = prompt('请输入图片URL:');
-              if (src) {
-                document.execCommand('insertImage', false, src);
-              }
-              break;
-            case 'heading':
-              document.execCommand('formatBlock', false, '<h3>');
-              break;
-            case 'list':
-              document.execCommand('insertUnorderedList', false, null);
-              break;
-            case 'clear':
-              document.execCommand('removeFormat', false, null);
-              break;
-          }
-        });
-      });
-      
-      // 预览按钮
-      const previewBtn = document.getElementById('previewBtn');
-      const previewModal = document.getElementById('previewModal');
-      const previewContent = document.getElementById('previewContent');
-      const closePreviewBtn = document.getElementById('closePreviewBtn');
-      
-      previewBtn.addEventListener('click', function() {
-        const title = document.getElementById('articleTitle').value || '未命名文章';
-        const category = document.getElementById('articleCategory').value || '未分类';
-        const content = document.getElementById('articleContent').innerHTML || '<p>无内容</p>';
-        const cover = document.getElementById('articleCover').value || `https://picsum.photos/600/400?random=99`;
-        
-        previewContent.innerHTML = `
-          <div class="mb-6">
-            <span class="bg-orange-light text-orange px-2 py-1 rounded-full text-sm">${category}</span>
-          </div>
-          <h1 class="text-3xl font-bold mb-6">${title}</h1>
-          <div class="mb-8">
-            <img src="${cover}" alt="文章封面" class="w-full h-64 object-cover rounded-lg">
-          </div>
-          <div class="prose max-w-none">
-            ${content}
-          </div>
-        `;
-        
-        previewModal.classList.remove('hidden');
-      });
-      
-      closePreviewBtn.addEventListener('click', function() {
-        previewModal.classList.add('hidden');
-      });
-      
-      // 点击模态框外部关闭
-      previewModal.addEventListener('click', function(e) {
-        if (e.target === previewModal) {
-          previewModal.classList.add('hidden');
-        }
-      });
-      
-      // 关闭通知
-      document.getElementById('closeNotification').addEventListener('click', hideNotification);
-      
-      // 文章网格事件委托 - 处理编辑和删除
-      document.getElementById('articlesGrid').addEventListener('click', function(e) {
-        handleArticleActions(e);
-      });
-      
-      // 管理页面表格事件委托 - 处理编辑和删除
-      document.getElementById('manageArticlesTable').addEventListener('click', function(e) {
-        handleArticleActions(e);
-      });
-      
-      // 处理文章操作（编辑/删除）
-      function handleArticleActions(e) {
-        // 编辑文章
-        if (e.target.closest('.edit-article')) {
-          e.preventDefault();
-          const id = parseInt(e.target.closest('.edit-article').getAttribute('data-id'));
-          const article = articles.find(a => a.id === id);
-          
-          if (article) {
-            // 填充表单
-            document.getElementById('articleId').value = article.id;
-            document.getElementById('articleTitle').value = article.title;
-            document.getElementById('articleCategory').value = article.category;
-            document.getElementById('articleCover').value = article.cover || '';
-            document.getElementById('articleContent').innerHTML = article.content;
-            document.getElementById('submitBtnText').textContent = '更新文章';
-            
-            // 切换到写文章页面
-            document.querySelectorAll('.page-content').forEach(pageEl => {
-              pageEl.classList.add('hidden');
-            });
-            document.getElementById('writePage').classList.remove('hidden');
-            
-            // 滚动到顶部
-            window.scrollTo({
-              top: 0,
-              behavior: 'smooth'
-            });
-          }
-        }
-        
-        // 删除文章
-        if (e.target.closest('.delete-article')) {
-          e.preventDefault();
-          const id = parseInt(e.target.closest('.delete-article').getAttribute('data-id'));
-          articleToDelete = id;
-          
-          // 显示删除确认模态框
-          document.getElementById('deleteConfirmModal').classList.remove('hidden');
-        }
-      }
-      
-      // 删除确认模态框操作
-      document.getElementById('cancelDeleteBtn').addEventListener('click', function() {
-        document.getElementById('deleteConfirmModal').classList.add('hidden');
-        articleToDelete = null;
-      });
-      
-      document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
-        if (articleToDelete !== null) {
-          deleteArticle(articleToDelete);
-        }
-        document.getElementById('deleteConfirmModal').classList.add('hidden');
-        articleToDelete = null;
-      });
-      
-      // 点击删除模态框外部关闭
-      document.getElementById('deleteConfirmModal').addEventListener('click', function(e) {
-        if (e.target === this) {
-          this.classList.add('hidden');
-          articleToDelete = null;
-        }
-      });
-      
-      // 排序按钮事件
-      document.querySelectorAll('.sort-btn').forEach(button => {
-        button.addEventListener('click', function() {
-          const sortType = this.getAttribute('data-sort');
-          
-          // 更新按钮样式
-          document.querySelectorAll('.sort-btn').forEach(btn => {
-            btn.classList.remove('active');
-          });
-          this.classList.add('active');
-          
-          // 更新排序方式并重新加载文章
-          currentSort = sortType;
-          currentPage = 1; // 重置到第一页
-          loadManageArticles(document.getElementById('manageSearchInput').value);
-        });
-      });
-      
-      // 搜索功能
-      const searchInput = document.getElementById('manageSearchInput');
-      searchInput.addEventListener('input', function() {
-        currentPage = 1; // 重置到第一页
-        loadManageArticles(this.value);
-      });
-      
-      // 分页按钮
-      document.getElementById('prevPageBtn').addEventListener('click', function() {
-        if (currentPage > 1) {
-          currentPage--;
-          loadManageArticles(searchInput.value);
-          scrollToTopOfManageTable();
-        }
-      });
-      
-      document.getElementById('nextPageBtn').addEventListener('click', function() {
-        const totalArticles = articles.length;
-        const totalPages = Math.ceil(totalArticles / articlesPerPage);
-        
-        if (currentPage < totalPages) {
-          currentPage++;
-          loadManageArticles(searchInput.value);
-          scrollToTopOfManageTable();
-        }
-      });
-      
-      // 滚动到管理表格顶部
-      function scrollToTopOfManageTable() {
-        const manageTable = document.getElementById('manageArticlesTable').closest('.overflow-x-auto');
-        if (manageTable) {
-          manageTable.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      }
-      
-      // 全选复选框
-      document.getElementById('selectAllCheckbox').addEventListener('change', function() {
-        const isChecked = this.checked;
-        const checkboxes = document.querySelectorAll('.article-checkbox');
-        
-        checkboxes.forEach(checkbox => {
-          checkbox.checked = isChecked;
-        });
-        
-        // 更新选中的文章ID
-        updateSelectedArticleIds();
-      });
-      
-      // 文章复选框事件委托
-      document.getElementById('manageArticlesTable').addEventListener('change', function(e) {
-        if (e.target.classList.contains('article-checkbox')) {
-          // 更新全选框状态
-          updateSelectAllStatus();
-          // 更新选中的文章ID
-          updateSelectedArticleIds();
-        }
-      });
-      
-      // 更新全选框状态
-      function updateSelectAllStatus() {
-        const checkboxes = document.querySelectorAll('.article-checkbox');
-        const checkedBoxes = document.querySelectorAll('.article-checkbox:checked');
-        document.getElementById('selectAllCheckbox').checked = checkboxes.length > 0 && checkboxes.length === checkedBoxes.length;
-      }
-      
-      // 更新选中的文章ID
-      function updateSelectedArticleIds() {
-        const checkedBoxes = document.querySelectorAll('.article-checkbox:checked');
-        selectedArticleIds = Array.from(checkedBoxes).map(checkbox => parseInt(checkbox.getAttribute('data-id')));
-        
-        // 更新批量删除按钮状态
-        const batchDeleteBtn = document.getElementById('batchDeleteBtn');
-        if (selectedArticleIds.length > 0) {
-          batchDeleteBtn.classList.remove('hidden');
-          batchDeleteBtn.innerHTML = `<i class="fa fa-trash" aria-hidden="true"></i> 批量删除 (${selectedArticleIds.length})`;
-        } else {
-          batchDeleteBtn.classList.add('hidden');
-          batchDeleteBtn.innerHTML = `<i class="fa fa-trash" aria-hidden="true"></i> 批量删除`;
-        }
-      }
-      
-      // 批量删除按钮
-      document.getElementById('batchDeleteBtn').addEventListener('click', function() {
-        if (selectedArticleIds.length === 0) return;
-        
-        if (confirm(`确定要删除选中的 ${selectedArticleIds.length} 篇文章吗？此操作无法撤销。`)) {
-          batchDeleteArticles(selectedArticleIds);
-          // 重置选中状态
-          selectedArticleIds = [];
-          document.getElementById('selectAllCheckbox').checked = false;
-          document.getElementById('batchDeleteBtn').innerHTML = `<i class="fa fa-trash" aria-hidden="true"></i> 批量删除`;
-        }
-      });
-      
-      // 新建文章按钮
-      document.getElementById('addNewArticleBtn').addEventListener('click', function() {
-        // 重置表单
-        resetArticleForm();
-        
-        // 切换到写文章页面
-        document.querySelectorAll('.page-content').forEach(pageEl => {
-          pageEl.classList.add('hidden');
-        });
-        document.getElementById('writePage').classList.remove('hidden');
-        
-        // 滚动到顶部
-        window.scrollTo({
-          top: 0,
-          behavior: 'smooth'
-        });
-      });
-    }
-  </script>
-</body>
-</html>
+          content: markdownContent, // 存储Markdown原始文本
+          isMarkdown: true // 标记
