@@ -1,18 +1,16 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+  <!-- 首要添加UTF-8编码声明，放在head最前面 -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>大柯的blog</title>
-  <!-- 引入外部依赖 -->
+  <!-- 引入Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 引入Font Awesome -->
   <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/marked@4.0.2/marked.min.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js"></script>
   
-  <!-- Tailwind自定义配置 -->
+  <!-- 配置Tailwind自定义颜色和字体 -->
   <script>
     tailwind.config = {
       theme: {
@@ -44,21 +42,41 @@
   <!-- 自定义工具类 -->
   <style type="text/tailwindcss">
     @layer utilities {
-      .content-auto { content-visibility: auto; }
-      .text-shadow { text-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-      .card-hover { transition: all 0.3s ease; }
-      .card-hover:hover { transform: translateY(-5px); }
-      .fade-in { animation: fadeIn 0.5s ease-in-out; }
-      .slide-up { animation: slideUp 0.5s ease-out; }
-      .slide-down { animation: slideDown 0.3s ease-in-out; }
-      .scale-in { animation: scaleIn 0.3s ease-in-out; }
+      .content-auto {
+        content-visibility: auto;
+      }
+      .text-shadow {
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+      .card-hover {
+        transition: all 0.3s ease;
+      }
+      .card-hover:hover {
+        transform: translateY(-5px);
+      }
+      .fade-in {
+        animation: fadeIn 0.5s ease-in-out;
+      }
+      .slide-up {
+        animation: slideUp 0.5s ease-out;
+      }
+      .slide-down {
+        animation: slideDown 0.3s ease-in-out;
+      }
+      .scale-in {
+        animation: scaleIn 0.3s ease-in-out;
+      }
     }
   </style>
   
-  <!-- 全局样式 -->
   <style>
+    /* 导入Inter字体 */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-    html { scroll-behavior: smooth; }
+    
+    /* 平滑滚动 */
+    html {
+      scroll-behavior: smooth;
+    }
     
     /* 渐变背景动画 */
     .gradient-bg {
@@ -73,32 +91,59 @@
       100% { background-position: 0% 50%; }
     }
     
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-    @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-    @keyframes scaleIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
     
-    /* Markdown预览样式 */
-    .markdown-preview h1 { font-size: 2em; margin: 0.67em 0; }
-    .markdown-preview h2 { font-size: 1.5em; margin: 0.83em 0; }
-    .markdown-preview h3 { font-size: 1.17em; margin: 1em 0; }
-    .markdown-preview p { margin: 1em 0; line-height: 1.8; }
-    .markdown-preview ul, .markdown-preview ol { margin: 1em 0 1em 2em; line-height: 1.8; }
-    .markdown-preview blockquote { border-left: 4px solid #FF9800; padding-left: 1em; margin: 1em 0; color: #616161; }
-    .markdown-preview pre { background: #f5f5f5; padding: 1em; border-radius: 4px; overflow-x: auto; margin: 1em 0; }
-    .markdown-preview code { background: #f5f5f5; padding: 0.2em 0.4em; border-radius: 4px; }
-    .markdown-preview img { max-width: 100%; height: auto; margin: 1em 0; border-radius: 4px; }
-    .markdown-preview a { color: #FF9800; text-decoration: none; }
-    .markdown-preview a:hover { text-decoration: underline; }
-    .markdown-preview table { border-collapse: collapse; margin: 1em 0; width: 100%; }
-    .markdown-preview th, .markdown-preview td { border: 1px solid #ddd; padding: 0.8em; text-align: left; }
-    .markdown-preview th { background-color: #f5f5f5; }
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
+    @keyframes slideDown {
+      from { transform: translateY(-20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
+    @keyframes scaleIn {
+      from { transform: scale(0.95); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
     
     /* 编辑器样式 */
-    .editor-toolbar button { transition: all 0.2s ease; }
-    .editor-toolbar button:hover { background-color: #FFE0B2; transform: scale(1.1); }
-    .editor-content:focus { outline: none; box-shadow: 0 0 0 2px rgba(255, 152, 0, 0.3); }
-    .markdown-editor { font-family: 'Consolas', 'Monaco', monospace; line-height: 1.6; }
+    .editor-toolbar button {
+      transition: all 0.2s ease;
+    }
+    
+    .editor-toolbar button:hover {
+      background-color: #FFE0B2;
+      transform: scale(1.1);
+    }
+    
+    .editor-content:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(255, 152, 0, 0.3);
+    }
+    
+    /* 管理表格样式 */
+    .manage-table tr {
+      transition: background-color 0.2s ease;
+    }
+    
+    .manage-table tr:hover {
+      background-color: rgba(255, 224, 178, 0.3);
+    }
+    
+    /* 排序按钮样式 */
+    .sort-btn.active {
+      background-color: #FF9800;
+      color: white;
+    }
+    
+    .sort-btn.active .sort-icon {
+      transform: rotate(180deg);
+    }
   </style>
 </head>
 
@@ -152,7 +197,7 @@
   </header>
 
   <main>
-    <!-- 页面容器 -->
+    <!-- 页面容器 - 所有页面内容都在这里切换显示 -->
     <div id="pageContainer">
       <!-- 首页内容 -->
       <div id="homePage" class="page-content">
@@ -160,7 +205,7 @@
         <section class="gradient-bg text-white py-16 md:py-24">
           <div class="container mx-auto px-4 text-center">
             <h1 class="text-4xl md:text-6xl font-bold mb-4 text-shadow">大柯的blog</h1>
-            <p class="text-lg md:text-xl max-w-2xl mx-auto opacity-90">支持Markdown和LaTeX的个人博客空间</p>
+            <p class="text-lg md:text-xl max-w-2xl mx-auto opacity-90">分享生活、技术与思考的个人空间</p>
           </div>
         </section>
         
@@ -178,6 +223,7 @@
           
           <!-- 文章网格 -->
           <div id="articlesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- 文章将通过JavaScript动态加载 -->
             <div id="noArticles" class="col-span-full text-center py-16 hidden">
               <i class="fa fa-file-text-o text-6xl text-neutral-300 mb-4" aria-hidden="true"></i>
               <p class="text-neutral-600 text-lg">还没有发布任何文章</p>
@@ -208,79 +254,6 @@
             </div>
           </div>
         </section>
-      </div>
-      
-      <!-- 文章阅读页面 -->
-      <div id="articlePage" class="page-content hidden py-12">
-        <div class="container mx-auto px-4 max-w-4xl">
-          <!-- 返回按钮 -->
-          <div class="mb-8">
-            <a href="#" class="inline-flex items-center text-neutral-600 hover:text-orange transition-colors back-to-list" data-page="home">
-              <i class="fa fa-arrow-left mr-2" aria-hidden="true"></i> 返回文章列表
-            </a>
-          </div>
-          
-          <!-- 文章内容 -->
-          <article class="bg-white rounded-xl shadow-md overflow-hidden">
-            <!-- 文章封面 -->
-            <div class="w-full h-64 md:h-80 overflow-hidden">
-              <img id="articleReadCover" src="" alt="文章封面" class="w-full h-full object-cover">
-            </div>
-            
-            <!-- 文章标题和元数据 -->
-            <div class="p-6 md:p-8">
-              <div class="flex items-center gap-2 text-sm text-neutral-600 mb-4 flex-wrap">
-                <span id="articleReadCategory" class="bg-orange-light text-orange px-2 py-1 rounded-full"></span>
-                <span id="articleReadDate"><i class="fa fa-calendar-o mr-1" aria-hidden="true"></i></span>
-                <span id="articleReadTime"><i class="fa fa-clock-o mr-1" aria-hidden="true"></i></span>
-              </div>
-              
-              <h1 id="articleReadTitle" class="text-3xl md:text-4xl font-bold mb-6"></h1>
-              
-              <div id="articleReadContent" class="markdown-preview text-lg text-neutral-800"></div>
-              
-              <!-- 文章操作按钮 -->
-              <div class="mt-12 pt-6 border-t border-neutral-200 flex flex-wrap gap-4 justify-between items-center">
-                <div class="flex gap-4">
-                  <button class="text-neutral-600 hover:text-orange transition-colors flex items-center gap-1 edit-article" data-id="">
-                    <i class="fa fa-pencil" aria-hidden="true"></i> 编辑
-                  </button>
-                  <button class="text-neutral-600 hover:text-red-500 transition-colors flex items-center gap-1 delete-article" data-id="">
-                    <i class="fa fa-trash" aria-hidden="true"></i> 删除
-                  </button>
-                </div>
-                
-                <div class="flex gap-4">
-                  <button class="text-neutral-600 hover:text-orange transition-colors flex items-center gap-1">
-                    <i class="fa fa-share-alt" aria-hidden="true"></i> 分享
-                  </button>
-                  <button class="text-neutral-600 hover:text-orange transition-colors flex items-center gap-1">
-                    <i class="fa fa-heart-o" aria-hidden="true"></i> 喜欢
-                  </button>
-                </div>
-              </div>
-            </div>
-          </article>
-          
-          <!-- 上下篇导航 -->
-          <div class="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div id="prevArticleContainer" class="bg-white rounded-xl shadow-md p-4 md:p-6 hidden">
-              <p class="text-sm text-neutral-600 mb-2">上一篇</p>
-              <a href="#" class="text-lg font-medium hover:text-orange transition-colors prev-article-link" data-id="">
-                <i class="fa fa-angle-left mr-1" aria-hidden="true"></i>
-                <span id="prevArticleTitle"></span>
-              </a>
-            </div>
-            
-            <div id="nextArticleContainer" class="bg-white rounded-xl shadow-md p-4 md:p-6 hidden md:text-right">
-              <p class="text-sm text-neutral-600 mb-2">下一篇</p>
-              <a href="#" class="text-lg font-medium hover:text-orange transition-colors next-article-link" data-id="">
-                <span id="nextArticleTitle"></span>
-                <i class="fa fa-angle-right ml-1" aria-hidden="true"></i>
-              </a>
-            </div>
-          </div>
-        </div>
       </div>
       
       <!-- 写文章页面 -->
@@ -322,147 +295,54 @@
               <input type="url" id="articleCover" name="cover" 
                      class="w-full px-4 py-3 rounded-lg border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-orange focus:border-transparent"
                      placeholder="输入图片URL...">
-              <p class="text-sm text-neutral-500 mt-1">建议尺寸：600x400px，支持网络图片URL（如https://picsum.photos/600/400）</p>
+              <p class="text-sm text-neutral-500 mt-1">建议尺寸：600x400px，支持网络图片URL</p>
             </div>
             
-            <!-- 编辑模式切换 -->
-            <div class="mb-4">
-              <div class="edit-mode-tabs flex border-b border-neutral-300">
-                <button type="button" id="markdownModeBtn" class="px-4 py-2 font-medium active">
-                  <i class="fa fa-markdown mr-1" aria-hidden="true"></i> Markdown编辑
+            <div class="mb-6">
+              <label class="block text-neutral-700 font-medium mb-2">内容编辑</label>
+              
+              <!-- 编辑器工具栏 -->
+              <div class="editor-toolbar flex flex-wrap gap-2 p-3 bg-neutral-100 rounded-t-lg border border-b-0 border-neutral-300">
+                <button type="button" data-action="bold" title="加粗">
+                  <i class="fa fa-bold" aria-hidden="true"></i>
                 </button>
-                <button type="button" id="previewModeBtn" class="px-4 py-2 font-medium text-neutral-600">
-                  <i class="fa fa-eye mr-1" aria-hidden="true"></i> 预览
+                <button type="button" data-action="italic" title="斜体">
+                  <i class="fa fa-italic" aria-hidden="true"></i>
                 </button>
-                <button type="button" id="splitModeBtn" class="px-4 py-2 font-medium text-neutral-600">
-                  <i class="fa fa-columns mr-1" aria-hidden="true"></i> 分屏编辑
+                <button type="button" data-action="link" title="插入链接">
+                  <i class="fa fa-link" aria-hidden="true"></i>
                 </button>
-              </div>
-            </div>
-            
-            <!-- 编辑器工具栏 -->
-            <div class="editor-toolbar flex flex-wrap gap-2 p-3 bg-neutral-100 rounded-t-lg border border-b-0 border-neutral-300">
-              <button type="button" data-action="heading1" title="标题1 (# 标题)">
-                <i class="fa fa-header" aria-hidden="true"></i> <sub>1</sub>
-              </button>
-              <button type="button" data-action="heading2" title="标题2 (## 标题)">
-                <i class="fa fa-header" aria-hidden="true"></i> <sub>2</sub>
-              </button>
-              <button type="button" data-action="heading3" title="标题3 (### 标题)">
-                <i class="fa fa-header" aria-hidden="true"></i> <sub>3</sub>
-              </button>
-              <span class="h-6 border-r border-neutral-300"></span>
-              <button type="button" data-action="bold" title="加粗 (**粗体**)">
-                <i class="fa fa-bold" aria-hidden="true"></i>
-              </button>
-              <button type="button" data-action="italic" title="斜体 (*斜体*)">
-                <i class="fa fa-italic" aria-hidden="true"></i>
-              </button>
-              <button type="button" data-action="strikethrough" title="删除线 (~~删除线~~)">
-                <i class="fa fa-strikethrough" aria-hidden="true"></i>
-              </button>
-              <span class="h-6 border-r border-neutral-300"></span>
-              <button type="button" data-action="link" title="链接 ([文本](链接))">
-                <i class="fa fa-link" aria-hidden="true"></i>
-              </button>
-              <button type="button" data-action="image" title="图片 (![描述](链接))">
-                <i class="fa fa-image" aria-hidden="true"></i>
-              </button>
-              <button type="button" data-action="code" title="代码 (`代码`)">
-                <i class="fa fa-code" aria-hidden="true"></i>
-              </button>
-              <span class="h-6 border-r border-neutral-300"></span>
-              <button type="button" data-action="quote" title="引用 (> 引用)">
-                <i class="fa fa-quote-right" aria-hidden="true"></i>
-              </button>
-              <button type="button" data-action="unordered-list" title="无序列表 (- 列表项)">
-                <i class="fa fa-list-ul" aria-hidden="true"></i>
-              </button>
-              <button type="button" data-action="ordered-list" title="有序列表 (1. 列表项)">
-                <i class="fa fa-list-ol" aria-hidden="true"></i>
-              </button>
-              <span class="h-6 border-r border-neutral-300"></span>
-              <button type="button" data-action="latex" title="LaTeX公式 ($公式$ 或 $$块公式$$)">
-                <i class="fa fa-superscript" aria-hidden="true"></i> TeX
-              </button>
-              <button type="button" data-action="table" title="表格">
-                <i class="fa fa-table" aria-hidden="true"></i>
-              </button>
-              <button type="button" data-action="hr" title="分割线 (---)">
-                <i class="fa fa-minus" aria-hidden="true"></i>
-              </button>
-            </div>
-            
-            <!-- 编辑器容器 -->
-            <div class="border border-neutral-300 rounded-b-lg overflow-hidden">
-              <!-- Markdown编辑区 -->
-              <div id="markdownEditor" class="w-full min-h-[400px] p-4 bg-white">
-                <textarea id="articleContent" class="markdown-editor w-full h-full min-h-[400px] p-2 focus:outline-none resize-none" 
-                          placeholder="使用Markdown编写文章内容...
-示例：
-# 这是一级标题
-**粗体文本** *斜体文本*
-- 无序列表项1
-- 无序列表项2
-LaTeX公式：$E=mc^2$ 或 $$\sum_{i=1}^n i = \frac{n(n+1)}{2}$$
-"></textarea>
+                <button type="button" data-action="image" title="插入图片">
+                  <i class="fa fa-image" aria-hidden="true"></i>
+                </button>
+                <button type="button" data-action="heading" title="标题">
+                  <i class="fa fa-header" aria-hidden="true"></i>
+                </button>
+                <button type="button" data-action="list" title="列表">
+                  <i class="fa fa-list-ul" aria-hidden="true"></i>
+                </button>
+                <button type="button" data-action="clear" title="清除格式">
+                  <i class="fa fa-eraser" aria-hidden="true"></i>
+                </button>
               </div>
               
-              <!-- 预览区 -->
-              <div id="previewArea" class="w-full min-h-[400px] p-4 bg-neutral-50 hidden markdown-preview"></div>
-              
-              <!-- 分屏编辑区 -->
-              <div id="splitEditor" class="hidden">
-                <div class="flex h-[400px]">
-                  <div class="w-1/2 border-r border-neutral-300">
-                    <textarea id="splitArticleContent" class="markdown-editor w-full h-full p-4 focus:outline-none resize-none" 
-                              placeholder="使用Markdown编写文章内容..."></textarea>
-                  </div>
-                  <div id="splitPreviewArea" class="w-1/2 p-4 overflow-y-auto markdown-preview"></div>
-                </div>
-              </div>
+              <!-- 编辑器内容区 -->
+              <div id="articleContent" class="editor-content w-full min-h-[300px] px-4 py-3 rounded-b-lg border border-neutral-300 focus:outline-none"
+                   contenteditable="true" placeholder="开始撰写文章内容..."></div>
             </div>
             
-            <div class="flex justify-end gap-4 mt-6">
+            <div class="flex justify-end gap-4">
               <button type="button" id="cancelEditBtn" class="px-6 py-3 bg-white border border-neutral-300 text-neutral-700 rounded-full font-medium hover:bg-neutral-100 transition-colors">
                 取消
               </button>
-              <button type="button" id="helpBtn" class="px-6 py-3 bg-white border border-neutral-300 text-neutral-700 rounded-full font-medium hover:bg-neutral-100 transition-colors">
-                <i class="fa fa-question-circle mr-1" aria-hidden="true"></i> 格式帮助
+              <button type="button" id="previewBtn" class="px-6 py-3 bg-white border border-neutral-300 text-neutral-700 rounded-full font-medium hover:bg-neutral-100 transition-colors">
+                预览
               </button>
               <button type="submit" class="px-6 py-3 bg-orange hover:bg-orange-dark text-white rounded-full font-medium transition-colors">
                 <span id="submitBtnText">发布文章</span> <i class="fa fa-paper-plane ml-1" aria-hidden="true"></i>
               </button>
             </div>
           </form>
-        </div>
-      </div>
-      
-      <!-- 格式帮助模态框 -->
-      <div id="helpModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden fade-in">
-        <div class="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto m-4">
-          <div class="p-6 border-b border-neutral-200 flex justify-between items-center">
-            <h3 class="text-xl font-bold">Markdown格式帮助</h3>
-            <button id="closeHelpBtn" class="text-neutral-500 hover:text-neutral-800 transition-colors">
-              <i class="fa fa-times text-xl" aria-hidden="true"></i>
-            </button>
-          </div>
-          <div class="p-6">
-            <div class="mb-6">
-              <h4 class="text-lg font-semibold mb-3">标题</h4>
-              <div class="bg-neutral-50 p-3 rounded-md mb-2"><pre># 一级标题\n## 二级标题\n### 三级标题</pre></div>
-              <div class="markdown-preview"><h1>一级标题</h1><h2>二级标题</h2><h3>三级标题</h3></div>
-            </div>
-            <div class="mb-6">
-              <h4 class="text-lg font-semibold mb-3">LaTeX公式</h4>
-              <div class="bg-neutral-50 p-3 rounded-md mb-2"><pre>内联公式: $E = mc^2$\n块级公式:$$\sum_{i=1}^n i = \frac{n(n+1)}{2}$$</pre></div>
-              <div class="markdown-preview">
-                <p>内联公式: $E = mc^2$</p>
-                <p>块级公式:$$\sum_{i=1}^n i = \frac{n(n+1)}{2}$$</p>
-              </div>
-            </div>
-            <!-- 其他格式帮助（标题/列表/链接等）省略，保持代码简洁 -->
-          </div>
         </div>
       </div>
       
@@ -497,7 +377,7 @@ LaTeX公式：$E=mc^2$ 或 $$\sum_{i=1}^n i = \frac{n(n+1)}{2}$$
                 <div class="flex items-center gap-2">
                   <label class="text-neutral-600 whitespace-nowrap">排序：</label>
                   <div class="flex flex-wrap gap-1">
-                    <button class="sort-btn px-3 py-1 rounded bg-white border border-neutral-300 hover:border-orange text-sm transition-colors active" data-sort="newest">
+                    <button class="sort-btn px-3 py-1 rounded bg-white border border-neutral-300 hover:border-orange text-sm transition-colors" data-sort="newest">
                       最新 <i class="fa fa-chevron-down sort-icon ml-1 text-xs" aria-hidden="true"></i>
                     </button>
                     <button class="sort-btn px-3 py-1 rounded bg-white border border-neutral-300 hover:border-orange text-sm transition-colors" data-sort="oldest">
@@ -508,6 +388,9 @@ LaTeX公式：$E=mc^2$ 或 $$\sum_{i=1}^n i = \frac{n(n+1)}{2}$$
                     </button>
                     <button class="sort-btn px-3 py-1 rounded bg-white border border-neutral-300 hover:border-orange text-sm transition-colors" data-sort="title-desc">
                       标题Z-A <i class="fa fa-chevron-down sort-icon ml-1 text-xs" aria-hidden="true"></i>
+                    </button>
+                    <button class="sort-btn px-3 py-1 rounded bg-white border border-neutral-300 hover:border-orange text-sm transition-colors" data-sort="category">
+                      分类 <i class="fa fa-chevron-down sort-icon ml-1 text-xs" aria-hidden="true"></i>
                     </button>
                   </div>
                 </div>
@@ -525,10 +408,12 @@ LaTeX公式：$E=mc^2$ 或 $$\sum_{i=1}^n i = \frac{n(n+1)}{2}$$
                     <th class="text-left py-3 px-4">标题</th>
                     <th class="text-left py-3 px-4 hidden md:table-cell">分类</th>
                     <th class="text-left py-3 px-4 hidden sm:table-cell">发布日期</th>
+                    <th class="text-left py-3 px-4 hidden lg:table-cell">阅读时间</th>
                     <th class="text-right py-3 px-4">操作</th>
                   </tr>
                 </thead>
                 <tbody id="manageArticlesTable">
+                  <!-- 管理文章将通过JavaScript动态加载 -->
                   <tr id="noArticlesManage" class="text-center">
                     <td colspan="6" class="py-12 text-neutral-500">
                       <i class="fa fa-file-text-o text-4xl mb-2" aria-hidden="true"></i>
@@ -553,6 +438,21 @@ LaTeX公式：$E=mc^2$ 或 $$\sum_{i=1}^n i = \frac{n(n+1)}{2}$$
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 文章预览模态框 -->
+      <div id="previewModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden fade-in">
+        <div class="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto m-4">
+          <div class="p-6 border-b border-neutral-200 flex justify-between items-center">
+            <h3 class="text-xl font-bold">文章预览</h3>
+            <button id="closePreviewBtn" class="text-neutral-500 hover:text-neutral-800 transition-colors">
+              <i class="fa fa-times text-xl" aria-hidden="true"></i>
+            </button>
+          </div>
+          <div id="previewContent" class="p-6">
+            <!-- 预览内容将通过JavaScript动态生成 -->
           </div>
         </div>
       </div>
@@ -638,10 +538,10 @@ LaTeX公式：$E=mc^2$ 或 $$\sum_{i=1}^n i = \frac{n(n+1)}{2}$$
               <div class="md:w-2/3">
                 <h3 class="text-2xl font-bold mb-4">大柯</h3>
                 <p class="text-neutral-600 mb-4">
-                  热爱技术与生活的创作者，致力于分享有价值的思考和经验。擅长前端开发、数据可视化，喜欢用文字记录成长。
+                  热爱技术与生活的创作者，致力于分享有价值的思考和经验。
                 </p>
                 <p class="text-neutral-600 mb-4">
-                  这个博客基于Tailwind CSS和GitHub API构建，支持Markdown编辑和LaTeX数学公式，特别适合分享技术文章和学术内容。希望通过文字与更多志同道合的朋友交流。
+                  这个博客是我记录成长、分享见解的空间，内容涵盖技术、生活、阅读等多个领域。希望通过文字与更多志同道合的朋友交流。
                 </p>
                 <div class="flex gap-4 mt-6">
                   <a href="#" class="text-neutral-600 hover:text-orange transition-colors text-xl">
@@ -668,7 +568,7 @@ LaTeX公式：$E=mc^2$ 或 $$\sum_{i=1}^n i = \frac{n(n+1)}{2}$$
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
         <div>
           <h3 class="text-xl font-bold mb-4 text-orange">大柯的blog</h3>
-          <p class="text-neutral-400 mb-4">支持Markdown和LaTeX的个人博客，分享技术、生活与思考，记录成长的点滴。</p>
+          <p class="text-neutral-400 mb-4">分享技术、生活与思考的个人博客，记录成长的点滴。</p>
           <div class="flex gap-4">
             <a href="#" class="text-neutral-400 hover:text-orange transition-colors text-lg">
               <i class="fa fa-github" aria-hidden="true"></i>
@@ -678,6 +578,9 @@ LaTeX公式：$E=mc^2$ 或 $$\sum_{i=1}^n i = \frac{n(n+1)}{2}$$
             </a>
             <a href="#" class="text-neutral-400 hover:text-orange transition-colors text-lg">
               <i class="fa fa-linkedin" aria-hidden="true"></i>
+            </a>
+            <a href="#" class="text-neutral-400 hover:text-orange transition-colors text-lg">
+              <i class="fa fa-instagram" aria-hidden="true"></i>
             </a>
           </div>
         </div>
@@ -689,6 +592,7 @@ LaTeX公式：$E=mc^2$ 或 $$\sum_{i=1}^n i = \frac{n(n+1)}{2}$$
             <li><a href="#" class="text-neutral-400 hover:text-orange transition-colors" data-page="categories">所有文章</a></li>
             <li><a href="#" class="text-neutral-400 hover:text-orange transition-colors" data-page="manage">管理文章</a></li>
             <li><a href="#" class="text-neutral-400 hover:text-orange transition-colors" data-page="about">关于我</a></li>
+            <li><a href="#" class="text-neutral-400 hover:text-orange transition-colors" data-page="write">写文章</a></li>
           </ul>
         </div>
         
@@ -699,12 +603,13 @@ LaTeX公式：$E=mc^2$ 或 $$\sum_{i=1}^n i = \frac{n(n+1)}{2}$$
             <li><a href="#" class="text-neutral-400 hover:text-orange transition-colors">生活</a></li>
             <li><a href="#" class="text-neutral-400 hover:text-orange transition-colors">思考</a></li>
             <li><a href="#" class="text-neutral-400 hover:text-orange transition-colors">旅行</a></li>
+            <li><a href="#" class="text-neutral-400 hover:text-orange transition-colors">阅读</a></li>
           </ul>
         </div>
       </div>
       
       <div class="border-t border-neutral-700 pt-8 text-center text-neutral-500 text-sm">
-        <p>&copy; 2024 大柯的blog. 基于GitHub API构建。</p>
+        <p>&copy; 2023 大柯的blog. 保留所有权利。</p>
       </div>
     </div>
   </footer>
@@ -715,7 +620,7 @@ LaTeX公式：$E=mc^2$ 或 $$\sum_{i=1}^n i = \frac{n(n+1)}{2}$$
   </button>
 
   <!-- 通知提示 -->
-  <div id="notification" class="fixed top-6 right-6 bg-white shadow-lg rounded-lg p-4 max-w-xs transform translate-x-[calc(100%+20px)] transition-transform duration-300 z-50 flex items-start gap-3">
+  <div id="notification" class="fixed top-6 right-6 bg-white shadow-lg rounded-lg p-4 max-w-xs transform translate-x-full transition-transform duration-300 z-50 flex items-start gap-3">
     <div id="notificationIcon" class="text-green-500 mt-0.5">
       <i class="fa fa-check-circle text-xl" aria-hidden="true"></i>
     </div>
@@ -728,454 +633,291 @@ LaTeX公式：$E=mc^2$ 或 $$\sum_{i=1}^n i = \frac{n(n+1)}{2}$$
     </button>
   </div>
 
-  <!-- JavaScript核心逻辑 -->
+  <!-- JavaScript -->
   <script>
-    // ======================== 1. GitHub API 配置（必须替换为你的信息！）========================
-    const GITHUB_CONFIG = {
-      owner: "你的GitHub用户名",    // 例："张三" → "zhangsan"
-      repo: "你的仓库名",          // 例："my-blog-data"
-      path: "passage.json",        // 文章数据文件路径（固定，无需修改）
-      branch: "main",              // 仓库分支（默认main，旧仓库可能是master）
-      token: "你的个人访问令牌PAT"  // 例："ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-    };
-
-    // ======================== 2. 全局变量 =========================
-    let allArticles = [];          // 存储所有文章
-    let currentSort = 'newest';    // 默认排序：最新
-    let currentPage = 1;           // 分页页码
-    const articlesPerPage = 10;    // 每页文章数
-    let selectedArticleIds = [];   // 批量删除选中的文章ID
-    let articleToDelete = null;    // 待删除的文章ID
-    let currentArticleId = null;   // 当前阅读的文章ID
-    let currentEditMode = 'markdown'; // 编辑模式：markdown/preview/split
-    let isApiLoading = false;      // API请求加载状态
-    window.articleFileSha = '';    // 文章文件的SHA值（GitHub更新必需）
-
-    // ======================== 3. 页面初始化 =========================
+    // 全局变量
+    let currentSort = 'newest';
+    let currentPage = 1;
+    const articlesPerPage = 10;
+    let selectedArticleIds = [];
+    let articleToDelete = null;
+    let articles = []; // 存储从JSON加载的文章
+    
+    // GitHub 配置
+    const GITHUB_USER = 'catigeru';
+    const GITHUB_REPO = 'catigeru.github.io';
+    const JSON_FILE_PATH = 'passage.json';
+    
+    // 页面加载完成后执行
     document.addEventListener('DOMContentLoaded', function() {
-      // 从GitHub加载文章（核心入口）
-      loadArticlesFromGitHub();
+      // 从JSON文件加载文章
+      loadArticlesFromJson();
       // 初始化事件监听
       initEventListeners();
-      // 初始化LaTeX渲染
-      renderMathInElement(document.body, {
-        delimiters: [
-          {left: '$$', right: '$$', display: true},
-          {left: '$', right: '$', display: false}
-        ]
-      });
+      // 设置默认排序
+      document.querySelector(`.sort-btn[data-sort="${currentSort}"]`).classList.add('active');
     });
-
-    // ======================== 4. GitHub API 核心函数 =========================
-    /**
-     * 从GitHub读取文章数据
-     */
-    async function loadArticlesFromGitHub() {
-      if (isApiLoading) return;
-      isApiLoading = true;
-      showNotification('加载中', '正在从GitHub加载文章...', false);
-
-      try {
-        // 1. 请求GitHub获取文件信息（含SHA值）
-        const fileRes = await fetch(
-          `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}?ref=${GITHUB_CONFIG.branch}`,
-          {
-            headers: {
-              Authorization: `token ${GITHUB_CONFIG.token}`,
-              Accept: "application/vnd.github.v3+json"
-            }
-          }
-        );
-
-        // 2. 处理文件不存在（首次使用时创建空文件）
-        if (fileRes.status === 404) {
-          await createEmptyArticleFile();
-          allArticles = [];
-        } else if (!fileRes.ok) {
-          throw new Error(`请求失败：${fileRes.statusText}`);
-        } else {
-          // 3. 解析文件内容（GitHub返回base64编码）
-          const fileData = await fileRes.json();
-          const decodedContent = atob(fileData.content); // base64解码
-          allArticles = JSON.parse(decodedContent) || [];
-          window.articleFileSha = fileData.sha; // 保存SHA值（更新必需）
+    
+    // 从JSON文件加载文章
+    function loadArticlesFromJson() {
+      // 显示加载状态
+      showNotification('加载中', '正在获取文章数据...', false);
+      
+      // 显式指定UTF-8编码读取
+      fetch(`https://${GITHUB_USER}.github.io/${JSON_FILE_PATH}`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Accept-Charset': 'utf-8' // 强制使用UTF-8编码
+        },
+        cache: 'no-store' // 禁用缓存，确保获取最新内容
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP错误，状态码: ${response.status}`);
         }
-
-        // 4. 加载完成后更新页面
+        // 先以文本形式获取，确保UTF-8解码
+        return response.text().then(text => {
+          try {
+            return JSON.parse(text);
+          } catch (e) {
+            console.error('JSON解析错误:', e);
+            showNotification('错误', '文章数据格式错误', true);
+            return [];
+          }
+        });
+      })
+      .then(data => {
+        articles = data || [];
+        // 加载文章到首页
         loadArticles();
+        // 加载文章到管理页面
         loadManageArticles();
+        // 更新分类统计
         updateCategoryCounts();
+        // 隐藏加载通知
         hideNotification();
-
-      } catch (error) {
-        console.error('GitHub读取失败：', error);
-        showNotification('错误', `加载失败：${error.message}`, true);
-      } finally {
-        isApiLoading = false;
-      }
+      })
+      .catch(error => {
+        console.error('加载文章失败:', error);
+        showNotification('错误', '加载文章失败，请稍后重试', true);
+      });
     }
-
-    /**
-     * 首次使用：创建空的passage.json文件
-     */
-    async function createEmptyArticleFile() {
-      const emptyContent = JSON.stringify([], null, 2); // 空数组（格式化JSON）
-      const encodedContent = btoa(emptyContent); // 转为base64
-
-      await fetch(
-        `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`,
-        {
-          method: "PUT",
+    
+    // 保存文章到GitHub（使用GitHub API）
+    function saveArticleToGitHub(article) {
+      // 检查是否有令牌
+      const token = localStorage.getItem('githubToken');
+      if (!token) {
+        showNotification('认证失败', '请先输入GitHub访问令牌', true);
+        return Promise.reject(new Error('未认证'));
+      }
+      
+      // 准备文章数据
+      let updatedArticles = [...articles];
+      
+      if (article.id) {
+        // 更新现有文章
+        const index = updatedArticles.findIndex(a => a.id === article.id);
+        if (index !== -1) {
+          updatedArticles[index] = article;
+        }
+      } else {
+        // 添加新文章
+        article.id = Date.now(); // 使用时间戳作为唯一ID
+        article.date = new Date().toISOString().split('T')[0]; // 格式化为YYYY-MM-DD
+        // 估算阅读时间（假设每分钟阅读200字）
+        const wordCount = article.content.replace(/<[^>]*>/g, '').length;
+        article.readTime = Math.ceil(wordCount / 200);
+        if (article.readTime < 1) article.readTime = 1;
+        
+        updatedArticles.unshift(article); // 添加到数组开头
+      }
+      
+      // 获取文件的SHA（用于GitHub API更新）
+      return fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${JSON_FILE_PATH}`, {
+        headers: {
+          'Authorization': `token ${token}`,
+          'Accept': 'application/vnd.github.v3+json'
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        // 准备更新数据
+        const content = JSON.stringify(updatedArticles, null, 2); // 格式化JSON，保留缩进
+        const base64Content = btoa(unescape(encodeURIComponent(content))); // 确保UTF-8编码的Base64转换
+        
+        // 调用GitHub API更新文件
+        return fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${JSON_FILE_PATH}`, {
+          method: 'PUT',
           headers: {
-            Authorization: `token ${GITHUB_CONFIG.token}`,
-            Accept: "application/vnd.github.v3+json"
+            'Authorization': `token ${token}`,
+            'Content-Type': 'application/json',
+            'Accept': 'application/vnd.github.v3+json'
           },
           body: JSON.stringify({
-            message: "初始化文章数据文件",
-            content: encodedContent,
-            branch: GITHUB_CONFIG.branch
+            message: article.id ? `更新文章: ${article.title}` : `新增文章: ${article.title}`,
+            content: base64Content,
+            sha: data.sha
           })
+        });
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`更新失败，状态码: ${response.status}`);
         }
-      );
-    }
-
-    /**
-     * 保存文章到GitHub（新增/更新）
-     * @param {Object} article - 文章对象
-     */
-    async function saveArticleToGitHub(article) {
-      if (isApiLoading) return;
-      isApiLoading = true;
-      const isUpdate = !!article.id;
-      showNotification('处理中', isUpdate ? '更新文章中...' : '发布文章中...', false);
-
-      try {
-        // 1. 准备更新后的文章数组
-        let updatedArticles = [...allArticles];
-        if (isUpdate) {
-          // 更新现有文章
-          updatedArticles = updatedArticles.map(a => a.id === article.id ? article : a);
-        } else {
-          // 新增文章：生成ID、日期、阅读时间
-          article.id = Date.now();
-          article.date = new Date().toISOString().split('T')[0];
-          const wordCount = article.content.replace(/[#*`\[\](){}]/g, '').length;
-          article.readTime = Math.ceil(wordCount / 200) || 1;
-          updatedArticles.unshift(article); // 最新文章排前面
-        }
-
-        // 2. 转为JSON并base64编码（GitHub要求）
-        const jsonContent = JSON.stringify(updatedArticles, null, 2);
-        const encodedContent = btoa(jsonContent);
-
-        // 3. 调用GitHub API更新文件
-        const res = await fetch(
-          `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`,
-          {
-            method: "PUT",
-            headers: {
-              Authorization: `token ${GITHUB_CONFIG.token}`,
-              Accept: "application/vnd.github.v3+json"
-            },
-            body: JSON.stringify({
-              message: isUpdate ? `更新文章：${article.title}` : `新增文章：${article.title}`,
-              content: encodedContent,
-              branch: GITHUB_CONFIG.branch,
-              sha: window.articleFileSha // 必需：确保文件版本一致
-            })
-          }
-        );
-
-        if (!res.ok) {
-          const errorData = await res.json();
-          throw new Error(errorData.message || '保存失败');
-        }
-
-        // 4. 更新本地数据和页面
-        allArticles = updatedArticles;
-        loadArticles();
-        loadManageArticles(document.getElementById('manageSearchInput').value);
-        updateCategoryCounts();
-        hideNotification();
-        showNotification('成功', isUpdate ? '文章已更新' : '文章已发布');
-
+        // 更新本地缓存
+        articles = updatedArticles;
         return article;
-
-      } catch (error) {
-        console.error('GitHub保存失败：', error);
-        showNotification('错误', `保存失败：${error.message}`, true);
-      } finally {
-        isApiLoading = false;
-      }
+      });
     }
-
-    /**
-     * 从GitHub删除文章（单篇/批量）
-     * @param {Array<number>} articleIds - 待删除文章ID数组
-     */
-    async function deleteArticlesFromGitHub(articleIds) {
-      if (isApiLoading || articleIds.length === 0) return;
-      isApiLoading = true;
-      const count = articleIds.length;
-      showNotification('处理中', `正在删除 ${count} 篇文章...`, false);
-
-      try {
-        // 1. 过滤掉待删除的文章
-        const updatedArticles = allArticles.filter(a => !articleIds.includes(a.id));
-
-        // 2. 转为JSON并base64编码
-        const jsonContent = JSON.stringify(updatedArticles, null, 2);
-        const encodedContent = btoa(jsonContent);
-
-        // 3. 调用GitHub API更新文件
-        const res = await fetch(
-          `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`,
-          {
-            method: "PUT",
-            headers: {
-              Authorization: `token ${GITHUB_CONFIG.token}`,
-              Accept: "application/vnd.github.v3+json"
-            },
-            body: JSON.stringify({
-              message: `删除 ${count} 篇文章`,
-              content: encodedContent,
-              branch: GITHUB_CONFIG.branch,
-              sha: window.articleFileSha
-            })
-          }
-        );
-
-        if (!res.ok) {
-          const errorData = await res.json();
-          throw new Error(errorData.message || '删除失败');
-        }
-
-        // 4. 更新本地数据和页面
-        allArticles = updatedArticles;
-        loadArticles();
-        loadManageArticles(document.getElementById('manageSearchInput').value);
-        updateCategoryCounts();
-        hideNotification();
-        showNotification('成功', `已删除 ${count} 篇文章`);
-
-      } catch (error) {
-        console.error('GitHub删除失败：', error);
-        showNotification('错误', `删除失败：${error.message}`, true);
-      } finally {
-        isApiLoading = false;
-      }
-    }
-
-    // ======================== 5. 页面渲染与交互函数 =========================
-    /**
-     * 加载首页文章列表
-     */
+    
+    // 加载文章到首页
     function loadArticles(category = 'all') {
       const articlesGrid = document.getElementById('articlesGrid');
       const noArticles = document.getElementById('noArticles');
-
+      
       // 清空现有内容
       Array.from(articlesGrid.children).forEach(child => {
-        if (child.id !== 'noArticles') child.remove();
+        if (child.id !== 'noArticles') {
+          articlesGrid.removeChild(child);
+        }
       });
-
-      // 过滤分类
-      let filtered = allArticles;
-      if (category !== 'all') filtered = filtered.filter(a => a.category === category);
-
-      if (filtered.length === 0) {
+      
+      // 过滤文章
+      let filteredArticles = articles;
+      if (category !== 'all') {
+        filteredArticles = articles.filter(article => article.category === category);
+      }
+      
+      if (filteredArticles.length === 0) {
+        // 没有文章时显示提示
         noArticles.classList.remove('hidden');
         return;
       }
+      
+      // 隐藏无文章提示
       noArticles.classList.add('hidden');
-
-      // 渲染文章卡片
-      filtered.forEach((article, index) => {
+      
+      // 显示文章
+      filteredArticles.forEach((article, index) => {
+        // 添加延迟动画效果
         setTimeout(() => {
-          const card = createArticleCard(article);
-          card.classList.add('fade-in', 'slide-up');
-          articlesGrid.appendChild(card);
+          const articleCard = createArticleCard(article);
+          articleCard.classList.add('fade-in', 'slide-up');
+          articlesGrid.appendChild(articleCard);
         }, index * 100);
       });
     }
-
-    /**
-     * 创建文章卡片
-     */
+    
+    // 创建文章卡片
     function createArticleCard(article) {
       const card = document.createElement('article');
       card.className = 'bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl card-hover';
+      
+      // 默认封面图
       const defaultCover = `https://picsum.photos/600/400?random=${article.id % 10}`;
-
-      // 处理摘要（移除Markdown/LaTeX标记）
-      let summary = article.content
-        .replace(/#{1,6}\s+/g, '')
-        .replace(/\*\*|__|\*|_/g, '')
-        .replace(/`[^`]+`|\$\$[^$]+\$\$|\$[^$]+\$/g, '')
-        .substring(0, 150);
-
+      
       card.innerHTML = `
         <div class="h-48 overflow-hidden">
-          <img src="${article.cover || defaultCover}" alt="${article.title}" 
-               class="w-full h-full object-cover transition-transform duration-500 hover:scale-110 opacity-0 transition-opacity duration-500">
+          <img src="${article.cover || defaultCover}" alt="${article.title}" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110 opacity-0 transition-opacity duration-500">
         </div>
         <div class="p-6">
-          <div class="flex items-center gap-2 text-sm text-neutral-600 mb-3">
+          <div class="flex items-center gap-2 text-sm text-neutral-600 mb-3 flex-wrap">
             <span class="bg-orange-light text-orange px-2 py-1 rounded-full">${article.category}</span>
-            <span><i class="fa fa-calendar-o mr-1"></i> ${article.date}</span>
-            <span><i class="fa fa-clock-o mr-1"></i> ${article.readTime}分钟</span>
+            <span><i class="fa fa-calendar-o mr-1" aria-hidden="true"></i> ${article.date}</span>
+            <span><i class="fa fa-clock-o mr-1" aria-hidden="true"></i> ${article.readTime}分钟阅读</span>
           </div>
           <h3 class="text-xl font-bold mb-3 hover:text-orange transition-colors">
-            <a href="#" class="read-article" data-id="${article.id}">${article.title}</a>
+            <a href="#">${article.title}</a>
           </h3>
-          <p class="text-neutral-600 mb-4 line-clamp-3">${summary}...</p>
+          <p class="text-neutral-600 mb-4 line-clamp-3">
+            ${article.content.replace(/<[^>]*>/g, '').substring(0, 150)}...
+          </p>
           <div class="flex justify-between items-center">
-            <a href="#" class="text-orange font-medium hover:underline read-article" data-id="${article.id}">
-              阅读全文 <i class="fa fa-long-arrow-right ml-2"></i>
+            <a href="#" class="inline-flex items-center text-orange font-medium hover:underline">
+              阅读全文 <i class="fa fa-long-arrow-right ml-2" aria-hidden="true"></i>
             </a>
             <div class="flex gap-2">
-              <button class="text-neutral-400 hover:text-orange edit-article" data-id="${article.id}">
-                <i class="fa fa-pencil"></i>
+              <button class="text-neutral-400 hover:text-orange transition-colors edit-article" data-id="${article.id}" title="编辑">
+                <i class="fa fa-pencil" aria-hidden="true"></i>
               </button>
-              <button class="text-neutral-400 hover:text-red-500 delete-article" data-id="${article.id}">
-                <i class="fa fa-trash"></i>
+              <button class="text-neutral-400 hover:text-red-500 transition-colors delete-article" data-id="${article.id}" title="删除">
+                <i class="fa fa-trash" aria-hidden="true"></i>
               </button>
             </div>
           </div>
         </div>
       `;
-
+      
       // 图片加载完成后显示
       const img = card.querySelector('img');
-      img.onload = () => img.classList.add('opacity-100');
-      if (img.complete) img.classList.add('opacity-100');
-
+      img.onload = () => {
+        img.classList.add('opacity-100');
+      };
+      if (img.complete) {
+        img.classList.add('opacity-100');
+      }
+      
       return card;
     }
-
-    /**
-     * 加载文章阅读页
-     */
-    function loadArticleForReading(articleId) {
-      const article = allArticles.find(a => a.id === articleId);
-      if (!article) {
-        showNotification('错误', '文章不存在', true);
-        return;
-      }
-
-      // 填充内容
-      document.getElementById('articleReadTitle').textContent = article.title;
-      document.getElementById('articleReadCategory').textContent = article.category;
-      document.getElementById('articleReadDate').innerHTML = `<i class="fa fa-calendar-o mr-1"></i> ${article.date}`;
-      document.getElementById('articleReadTime').innerHTML = `<i class="fa fa-clock-o mr-1"></i> ${article.readTime}分钟阅读`;
-      
-      // 渲染Markdown+LaTeX
-      const contentEl = document.getElementById('articleReadContent');
-      contentEl.innerHTML = marked.parse(article.content);
-      renderMathInElement(contentEl, {
-        delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]
-      });
-
-      // 封面图
-      const coverEl = document.getElementById('articleReadCover');
-      const defaultCover = `https://picsum.photos/600/400?random=${article.id % 10}`;
-      coverEl.src = article.cover || defaultCover;
-      coverEl.alt = article.title;
-
-      // 设置操作按钮ID
-      document.querySelector('.edit-article[data-id=""]').setAttribute('data-id', article.id);
-      document.querySelector('.delete-article[data-id=""]').setAttribute('data-id', article.id);
-
-      // 更新上下篇导航
-      updateArticleNavigation(articleId);
-
-      // 切换页面
-      document.querySelectorAll('.page-content').forEach(page => page.classList.add('hidden'));
-      document.getElementById('articlePage').classList.remove('hidden');
-      window.scrollTo({top: 0, behavior: 'smooth'});
-    }
-
-    /**
-     * 更新上下篇导航
-     */
-    function updateArticleNavigation(currentId) {
-      const sorted = [...allArticles].sort((a, b) => new Date(b.date) - new Date(a.date));
-      const currentIdx = sorted.findIndex(a => a.id === currentId);
-
-      // 上一篇
-      const prevEl = document.getElementById('prevArticleContainer');
-      const prevTitleEl = document.getElementById('prevArticleTitle');
-      const prevLinkEl = document.querySelector('.prev-article-link');
-      if (currentIdx < sorted.length - 1) {
-        const prev = sorted[currentIdx + 1];
-        prevTitleEl.textContent = prev.title;
-        prevLinkEl.setAttribute('data-id', prev.id);
-        prevEl.classList.remove('hidden');
-      } else {
-        prevEl.classList.add('hidden');
-      }
-
-      // 下一篇
-      const nextEl = document.getElementById('nextArticleContainer');
-      const nextTitleEl = document.getElementById('nextArticleTitle');
-      const nextLinkEl = document.querySelector('.next-article-link');
-      if (currentIdx > 0) {
-        const next = sorted[currentIdx - 1];
-        nextTitleEl.textContent = next.title;
-        nextLinkEl.setAttribute('data-id', next.id);
-        nextEl.classList.remove('hidden');
-      } else {
-        nextEl.classList.add('hidden');
-      }
-    }
-
-    /**
-     * 加载管理页文章表格
-     */
+    
+    // 加载文章到管理页面
     function loadManageArticles(searchQuery = '') {
+      let filteredArticles = [...articles];
       const tableBody = document.getElementById('manageArticlesTable');
-      const noArticlesEl = document.getElementById('noArticlesManage');
-
-      // 清空内容
+      const noArticlesManage = document.getElementById('noArticlesManage');
+      
+      // 清空现有内容
       Array.from(tableBody.children).forEach(child => {
-        if (child.id !== 'noArticlesManage') child.remove();
+        if (child.id !== 'noArticlesManage') {
+          tableBody.removeChild(child);
+        }
       });
-
+      
       // 搜索过滤
-      let filtered = allArticles;
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
-        filtered = filtered.filter(a => 
-          a.title.toLowerCase().includes(query) || 
-          a.category.toLowerCase().includes(query)
+        filteredArticles = filteredArticles.filter(article => 
+          article.title.toLowerCase().includes(query) || 
+          article.category.toLowerCase().includes(query) ||
+          article.content.replace(/<[^>]*>/g, '').toLowerCase().includes(query)
         );
       }
-
+      
       // 排序
-      filtered = sortArticles(filtered, currentSort);
-
+      filteredArticles = sortArticles(filteredArticles, currentSort);
+      
       // 分页处理
-      const total = filtered.length;
-      const totalPages = Math.ceil(total / articlesPerPage);
-      const start = (currentPage - 1) * articlesPerPage;
-      const paginated = filtered.slice(start, start + articlesPerPage);
-
+      const totalArticles = filteredArticles.length;
+      const totalPages = Math.ceil(totalArticles / articlesPerPage);
+      const startIndex = (currentPage - 1) * articlesPerPage;
+      const endIndex = startIndex + articlesPerPage;
+      const paginatedArticles = filteredArticles.slice(startIndex, endIndex);
+      
       // 更新分页信息
-      document.getElementById('showingCount').textContent = paginated.length;
-      document.getElementById('totalCount').textContent = total;
+      document.getElementById('showingCount').textContent = paginatedArticles.length;
+      document.getElementById('totalCount').textContent = totalArticles;
+      
+      // 更新分页按钮状态
       document.getElementById('prevPageBtn').disabled = currentPage === 1;
-      document.getElementById('nextPageBtn').disabled = currentPage === totalPages || total === 0;
-
-      if (total === 0) {
-        noArticlesEl.classList.remove('hidden');
+      document.getElementById('nextPageBtn').disabled = currentPage === totalPages || totalPages === 0;
+      
+      if (totalArticles === 0) {
+        // 没有文章时显示提示
+        noArticlesManage.classList.remove('hidden');
         document.getElementById('batchDeleteBtn').classList.add('hidden');
         return;
       }
-      noArticlesEl.classList.add('hidden');
+      
+      // 隐藏无文章提示
+      noArticlesManage.classList.add('hidden');
+      
+      // 显示批量删除按钮（如果有文章）
       document.getElementById('batchDeleteBtn').classList.remove('hidden');
-
-      // 渲染表格行
-      paginated.forEach(article => {
+      
+      // 显示文章
+      paginatedArticles.forEach(article => {
         const row = document.createElement('tr');
         row.className = 'border-b border-neutral-200';
         row.innerHTML = `
@@ -1183,4 +925,677 @@ LaTeX公式：$E=mc^2$ 或 $$\sum_{i=1}^n i = \frac{n(n+1)}{2}$$
             <input type="checkbox" class="article-checkbox rounded text-orange focus:ring-orange" data-id="${article.id}">
           </td>
           <td class="py-3 px-4">
-            <div class="font-medium hover:text-orange transition-colors read-article" data-id="${article.id}">${article
+            <div class="font-medium hover:text-orange transition-colors">${article.title}</div>
+          </td>
+          <td class="py-3 px-4 hidden md:table-cell">
+            <span class="bg-orange-light text-orange px-2 py-1 rounded-full text-sm">${article.category}</span>
+          </td>
+          <td class="py-3 px-4 hidden sm:table-cell text-neutral-600">${article.date}</td>
+          <td class="py-3 px-4 hidden lg:table-cell text-neutral-600">${article.readTime} 分钟</td>
+          <td class="py-3 px-4 text-right">
+            <div class="flex justify-end gap-2">
+              <button class="text-neutral-600 hover:text-orange transition-colors edit-article" data-id="${article.id}" title="编辑">
+                <i class="fa fa-pencil" aria-hidden="true"></i>
+              </button>
+              <button class="text-neutral-600 hover:text-red-500 transition-colors delete-article" data-id="${article.id}" title="删除">
+                <i class="fa fa-trash" aria-hidden="true"></i>
+              </button>
+            </div>
+          </td>
+        `;
+        tableBody.appendChild(row);
+      });
+      
+      // 重置选中状态
+      selectedArticleIds = [];
+      document.getElementById('selectAllCheckbox').checked = false;
+    }
+    
+    // 排序文章
+    function sortArticles(articles, sortType) {
+      switch (sortType) {
+        case 'newest':
+          return articles.sort((a, b) => new Date(b.date) - new Date(a.date));
+        case 'oldest':
+          return articles.sort((a, b) => new Date(a.date) - new Date(b.date));
+        case 'title-asc':
+          return articles.sort((a, b) => a.title.localeCompare(b.title));
+        case 'title-desc':
+          return articles.sort((a, b) => b.title.localeCompare(a.title));
+        case 'category':
+          return articles.sort((a, b) => a.category.localeCompare(b.category));
+        default:
+          return articles;
+      }
+    }
+    
+    // 更新分类统计
+    function updateCategoryCounts() {
+      const counts = {
+        '技术': 0,
+        '生活': 0,
+        '思考': 0,
+        '旅行': 0,
+        '阅读': 0
+      };
+      
+      articles.forEach(article => {
+        if (counts.hasOwnProperty(article.category)) {
+          counts[article.category]++;
+        }
+      });
+      
+      document.getElementById('techCount').textContent = counts['技术'];
+      document.getElementById('lifeCount').textContent = counts['生活'];
+      document.getElementById('thoughtCount').textContent = counts['思考'];
+    }
+    
+    // 显示通知
+    function showNotification(title, message, isError = false) {
+      const notification = document.getElementById('notification');
+      const notificationTitle = document.getElementById('notificationTitle');
+      const notificationMessage = document.getElementById('notificationMessage');
+      const notificationIcon = document.getElementById('notificationIcon');
+      
+      notificationTitle.textContent = title;
+      notificationMessage.textContent = message;
+      
+      // 设置图标和颜色
+      if (isError) {
+        notificationIcon.className = 'text-red-500 mt-0.5';
+        notificationIcon.innerHTML = '<i class="fa fa-exclamation-circle text-xl" aria-hidden="true"></i>';
+      } else {
+        notificationIcon.className = 'text-green-500 mt-0.5';
+        notificationIcon.innerHTML = '<i class="fa fa-check-circle text-xl" aria-hidden="true"></i>';
+      }
+      
+      // 显示通知
+      notification.classList.remove('translate-x-full');
+    }
+    
+    // 隐藏通知
+    function hideNotification() {
+      const notification = document.getElementById('notification');
+      notification.classList.add('translate-x-full');
+    }
+    
+    // 删除文章
+    function deleteArticle(id) {
+      const token = localStorage.getItem('githubToken');
+      if (!token) {
+        showNotification('认证失败', '请先输入GitHub访问令牌', true);
+        return;
+      }
+      
+      // 过滤掉要删除的文章
+      const updatedArticles = articles.filter(a => a.id !== id);
+      
+      // 获取文件的SHA
+      fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${JSON_FILE_PATH}`, {
+        headers: {
+          'Authorization': `token ${token}`,
+          'Accept': 'application/vnd.github.v3+json'
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        // 准备更新数据
+        const content = JSON.stringify(updatedArticles, null, 2);
+        const base64Content = btoa(unescape(encodeURIComponent(content))); // 确保UTF-8编码
+        
+        // 调用GitHub API更新文件
+        return fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${JSON_FILE_PATH}`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `token ${token}`,
+            'Content-Type': 'application/json',
+            'Accept': 'application/vnd.github.v3+json'
+          },
+          body: JSON.stringify({
+            message: '删除文章',
+            content: base64Content,
+            sha: data.sha
+          })
+        });
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`删除失败，状态码: ${response.status}`);
+        }
+        // 更新本地缓存
+        articles = updatedArticles;
+        // 重新加载文章列表
+        loadArticles();
+        loadManageArticles(document.getElementById('manageSearchInput').value);
+        // 更新分类统计
+        updateCategoryCounts();
+        
+        showNotification('成功', '文章已删除');
+      })
+      .catch(error => {
+        console.error('删除文章失败:', error);
+        showNotification('错误', '删除文章失败，请稍后重试', true);
+      });
+    }
+    
+    // 批量删除文章
+    function batchDeleteArticles(ids) {
+      if (ids.length === 0) return;
+      
+      const token = localStorage.getItem('githubToken');
+      if (!token) {
+        showNotification('认证失败', '请先输入GitHub访问令牌', true);
+        return;
+      }
+      
+      // 过滤掉要删除的文章
+      const updatedArticles = articles.filter(a => !ids.includes(a.id));
+      
+      // 获取文件的SHA
+      fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${JSON_FILE_PATH}`, {
+        headers: {
+          'Authorization': `token ${token}`,
+          'Accept': 'application/vnd.github.v3+json'
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        // 准备更新数据
+        const content = JSON.stringify(updatedArticles, null, 2);
+        const base64Content = btoa(unescape(encodeURIComponent(content))); // 确保UTF-8编码
+        
+        // 调用GitHub API更新文件
+        return fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${JSON_FILE_PATH}`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `token ${token}`,
+            'Content-Type': 'application/json',
+            'Accept': 'application/vnd.github.v3+json'
+          },
+          body: JSON.stringify({
+            message: `批量删除 ${ids.length} 篇文章`,
+            content: base64Content,
+            sha: data.sha
+          })
+        });
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`删除失败，状态码: ${response.status}`);
+        }
+        // 更新本地缓存
+        articles = updatedArticles;
+        // 重新加载文章列表
+        loadArticles();
+        loadManageArticles(document.getElementById('manageSearchInput').value);
+        // 更新分类统计
+        updateCategoryCounts();
+        
+        showNotification('成功', `已删除 ${ids.length} 篇文章`);
+      })
+      .catch(error => {
+        console.error('批量删除文章失败:', error);
+        showNotification('错误', '删除文章失败，请稍后重试', true);
+      });
+    }
+    
+    // 初始化事件监听
+    function initEventListeners() {
+      // 检查是否有GitHub令牌，没有则提示输入
+      if (!localStorage.getItem('githubToken')) {
+        const token = prompt('请输入你的GitHub个人访问令牌（需要repo权限）：');
+        if (token) {
+          localStorage.setItem('githubToken', token);
+          showNotification('认证成功', '已保存GitHub访问令牌');
+        } else {
+          showNotification('提示', '没有令牌将无法保存文章修改', false);
+        }
+      }
+      
+      // 移动端菜单切换
+      const menuBtn = document.getElementById('menuBtn');
+      const mobileMenu = document.getElementById('mobileMenu');
+      
+      menuBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+        mobileMenu.classList.toggle('slide-down');
+      });
+      
+      // 页面切换
+      document.querySelectorAll('[data-page]').forEach(link => {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          const page = this.getAttribute('data-page');
+          
+          // 隐藏所有页面
+          document.querySelectorAll('.page-content').forEach(pageEl => {
+            pageEl.classList.add('hidden');
+          });
+          
+          // 显示目标页面
+          document.getElementById(`${page}Page`).classList.remove('hidden');
+          
+          // 关闭移动菜单
+          mobileMenu.classList.add('hidden');
+          
+          // 如果切换到管理页面，重新加载文章
+          if (page === 'manage') {
+            currentPage = 1;
+            loadManageArticles();
+          }
+          
+          // 滚动到顶部
+          window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+          });
+        });
+      });
+      
+      // 返回顶部按钮
+      const backToTopBtn = document.getElementById('backToTop');
+      
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) {
+          backToTopBtn.classList.remove('opacity-0', 'invisible');
+          backToTopBtn.classList.add('opacity-100', 'visible');
+        } else {
+          backToTopBtn.classList.remove('opacity-100', 'visible');
+          backToTopBtn.classList.add('opacity-0', 'invisible');
+        }
+        
+        // 导航栏滚动效果
+        const header = document.querySelector('header');
+        if (window.scrollY > 100) {
+          header.classList.add('py-2');
+          header.classList.remove('py-4');
+        } else {
+          header.classList.add('py-4');
+          header.classList.remove('py-2');
+        }
+      });
+      
+      backToTopBtn.addEventListener('click', () => {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      });
+      
+      // 文章表单提交
+      const articleForm = document.getElementById('articleForm');
+      
+      articleForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // 获取表单数据
+        const article = {
+          id: document.getElementById('articleId').value ? parseInt(document.getElementById('articleId').value) : null,
+          title: document.getElementById('articleTitle').value,
+          category: document.getElementById('articleCategory').value,
+          cover: document.getElementById('articleCover').value,
+          content: document.getElementById('articleContent').innerHTML
+        };
+        
+        // 验证表单
+        if (!article.title || !article.category || !article.content.trim()) {
+          showNotification('错误', '请填写标题、分类和内容', true);
+          return;
+        }
+        
+        // 显示加载状态
+        showNotification('保存中', '正在保存文章...', false);
+        
+        // 保存文章到GitHub
+        saveArticleToGitHub(article)
+          .then(savedArticle => {
+            // 重置表单
+            resetArticleForm();
+            
+            // 显示成功通知
+            showNotification('成功', article.id ? '文章已更新' : '文章已发布');
+            
+            // 切换到首页
+            document.querySelectorAll('.page-content').forEach(pageEl => {
+              pageEl.classList.add('hidden');
+            });
+            document.getElementById('homePage').classList.remove('hidden');
+            
+            // 重新加载文章列表
+            loadArticles();
+            loadManageArticles();
+            // 更新分类统计
+            updateCategoryCounts();
+          })
+          .catch(error => {
+            console.error('保存文章失败:', error);
+            showNotification('错误', '保存文章失败，请稍后重试', true);
+          });
+      });
+      
+      // 重置文章表单
+      function resetArticleForm() {
+        document.getElementById('articleForm').reset();
+        document.getElementById('articleId').value = '';
+        document.getElementById('articleContent').innerHTML = '';
+        document.getElementById('submitBtnText').textContent = '发布文章';
+      }
+      
+      // 取消编辑按钮
+      document.getElementById('cancelEditBtn').addEventListener('click', function() {
+        resetArticleForm();
+        
+        // 切换到首页
+        document.querySelectorAll('.page-content').forEach(pageEl => {
+          pageEl.classList.add('hidden');
+        });
+        document.getElementById('homePage').classList.remove('hidden');
+      });
+      
+      // 分类筛选
+      document.querySelectorAll('.category-filter').forEach(button => {
+        button.addEventListener('click', function() {
+          // 更新按钮样式
+          document.querySelectorAll('.category-filter').forEach(btn => {
+            btn.classList.remove('bg-orange', 'text-white');
+            btn.classList.add('bg-white', 'border', 'border-neutral-300', 'hover:border-orange', 'hover:text-orange');
+          });
+          this.classList.remove('bg-white', 'border', 'border-neutral-300', 'hover:border-orange', 'hover:text-orange');
+          this.classList.add('bg-orange', 'text-white');
+          
+          // 加载对应分类的文章
+          const category = this.getAttribute('data-category');
+          loadArticles(category);
+        });
+      });
+      
+      // 编辑器工具栏
+      document.querySelectorAll('.editor-toolbar button').forEach(button => {
+        button.addEventListener('click', function() {
+          const action = this.getAttribute('data-action');
+          const content = document.getElementById('articleContent');
+          
+          // 确保内容区获得焦点
+          content.focus();
+          
+          switch (action) {
+            case 'bold':
+              document.execCommand('bold', false, null);
+              break;
+            case 'italic':
+              document.execCommand('italic', false, null);
+              break;
+            case 'link':
+              const url = prompt('请输入链接地址:');
+              if (url) {
+                document.execCommand('createLink', false, url);
+              }
+              break;
+            case 'image':
+              const src = prompt('请输入图片URL:');
+              if (src) {
+                document.execCommand('insertImage', false, src);
+              }
+              break;
+            case 'heading':
+              document.execCommand('formatBlock', false, '<h3>');
+              break;
+            case 'list':
+              document.execCommand('insertUnorderedList', false, null);
+              break;
+            case 'clear':
+              document.execCommand('removeFormat', false, null);
+              break;
+          }
+        });
+      });
+      
+      // 预览按钮
+      const previewBtn = document.getElementById('previewBtn');
+      const previewModal = document.getElementById('previewModal');
+      const previewContent = document.getElementById('previewContent');
+      const closePreviewBtn = document.getElementById('closePreviewBtn');
+      
+      previewBtn.addEventListener('click', function() {
+        const title = document.getElementById('articleTitle').value || '未命名文章';
+        const category = document.getElementById('articleCategory').value || '未分类';
+        const content = document.getElementById('articleContent').innerHTML || '<p>无内容</p>';
+        const cover = document.getElementById('articleCover').value || `https://picsum.photos/600/400?random=99`;
+        
+        previewContent.innerHTML = `
+          <div class="mb-6">
+            <span class="bg-orange-light text-orange px-2 py-1 rounded-full text-sm">${category}</span>
+          </div>
+          <h1 class="text-3xl font-bold mb-6">${title}</h1>
+          <div class="mb-8">
+            <img src="${cover}" alt="文章封面" class="w-full h-64 object-cover rounded-lg">
+          </div>
+          <div class="prose max-w-none">
+            ${content}
+          </div>
+        `;
+        
+        previewModal.classList.remove('hidden');
+      });
+      
+      closePreviewBtn.addEventListener('click', function() {
+        previewModal.classList.add('hidden');
+      });
+      
+      // 点击模态框外部关闭
+      previewModal.addEventListener('click', function(e) {
+        if (e.target === previewModal) {
+          previewModal.classList.add('hidden');
+        }
+      });
+      
+      // 关闭通知
+      document.getElementById('closeNotification').addEventListener('click', hideNotification);
+      
+      // 文章网格事件委托 - 处理编辑和删除
+      document.getElementById('articlesGrid').addEventListener('click', function(e) {
+        handleArticleActions(e);
+      });
+      
+      // 管理页面表格事件委托 - 处理编辑和删除
+      document.getElementById('manageArticlesTable').addEventListener('click', function(e) {
+        handleArticleActions(e);
+      });
+      
+      // 处理文章操作（编辑/删除）
+      function handleArticleActions(e) {
+        // 编辑文章
+        if (e.target.closest('.edit-article')) {
+          e.preventDefault();
+          const id = parseInt(e.target.closest('.edit-article').getAttribute('data-id'));
+          const article = articles.find(a => a.id === id);
+          
+          if (article) {
+            // 填充表单
+            document.getElementById('articleId').value = article.id;
+            document.getElementById('articleTitle').value = article.title;
+            document.getElementById('articleCategory').value = article.category;
+            document.getElementById('articleCover').value = article.cover || '';
+            document.getElementById('articleContent').innerHTML = article.content;
+            document.getElementById('submitBtnText').textContent = '更新文章';
+            
+            // 切换到写文章页面
+            document.querySelectorAll('.page-content').forEach(pageEl => {
+              pageEl.classList.add('hidden');
+            });
+            document.getElementById('writePage').classList.remove('hidden');
+            
+            // 滚动到顶部
+            window.scrollTo({
+              top: 0,
+              behavior: 'smooth'
+            });
+          }
+        }
+        
+        // 删除文章
+        if (e.target.closest('.delete-article')) {
+          e.preventDefault();
+          const id = parseInt(e.target.closest('.delete-article').getAttribute('data-id'));
+          articleToDelete = id;
+          
+          // 显示删除确认模态框
+          document.getElementById('deleteConfirmModal').classList.remove('hidden');
+        }
+      }
+      
+      // 删除确认模态框操作
+      document.getElementById('cancelDeleteBtn').addEventListener('click', function() {
+        document.getElementById('deleteConfirmModal').classList.add('hidden');
+        articleToDelete = null;
+      });
+      
+      document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+        if (articleToDelete !== null) {
+          deleteArticle(articleToDelete);
+        }
+        document.getElementById('deleteConfirmModal').classList.add('hidden');
+        articleToDelete = null;
+      });
+      
+      // 点击删除模态框外部关闭
+      document.getElementById('deleteConfirmModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+          this.classList.add('hidden');
+          articleToDelete = null;
+        }
+      });
+      
+      // 排序按钮事件
+      document.querySelectorAll('.sort-btn').forEach(button => {
+        button.addEventListener('click', function() {
+          const sortType = this.getAttribute('data-sort');
+          
+          // 更新按钮样式
+          document.querySelectorAll('.sort-btn').forEach(btn => {
+            btn.classList.remove('active');
+          });
+          this.classList.add('active');
+          
+          // 更新排序方式并重新加载文章
+          currentSort = sortType;
+          currentPage = 1; // 重置到第一页
+          loadManageArticles(document.getElementById('manageSearchInput').value);
+        });
+      });
+      
+      // 搜索功能
+      const searchInput = document.getElementById('manageSearchInput');
+      searchInput.addEventListener('input', function() {
+        currentPage = 1; // 重置到第一页
+        loadManageArticles(this.value);
+      });
+      
+      // 分页按钮
+      document.getElementById('prevPageBtn').addEventListener('click', function() {
+        if (currentPage > 1) {
+          currentPage--;
+          loadManageArticles(searchInput.value);
+          scrollToTopOfManageTable();
+        }
+      });
+      
+      document.getElementById('nextPageBtn').addEventListener('click', function() {
+        const totalArticles = articles.length;
+        const totalPages = Math.ceil(totalArticles / articlesPerPage);
+        
+        if (currentPage < totalPages) {
+          currentPage++;
+          loadManageArticles(searchInput.value);
+          scrollToTopOfManageTable();
+        }
+      });
+      
+      // 滚动到管理表格顶部
+      function scrollToTopOfManageTable() {
+        const manageTable = document.getElementById('manageArticlesTable').closest('.overflow-x-auto');
+        if (manageTable) {
+          manageTable.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+      
+      // 全选复选框
+      document.getElementById('selectAllCheckbox').addEventListener('change', function() {
+        const isChecked = this.checked;
+        const checkboxes = document.querySelectorAll('.article-checkbox');
+        
+        checkboxes.forEach(checkbox => {
+          checkbox.checked = isChecked;
+        });
+        
+        // 更新选中的文章ID
+        updateSelectedArticleIds();
+      });
+      
+      // 文章复选框事件委托
+      document.getElementById('manageArticlesTable').addEventListener('change', function(e) {
+        if (e.target.classList.contains('article-checkbox')) {
+          // 更新全选框状态
+          updateSelectAllStatus();
+          // 更新选中的文章ID
+          updateSelectedArticleIds();
+        }
+      });
+      
+      // 更新全选框状态
+      function updateSelectAllStatus() {
+        const checkboxes = document.querySelectorAll('.article-checkbox');
+        const checkedBoxes = document.querySelectorAll('.article-checkbox:checked');
+        document.getElementById('selectAllCheckbox').checked = checkboxes.length > 0 && checkboxes.length === checkedBoxes.length;
+      }
+      
+      // 更新选中的文章ID
+      function updateSelectedArticleIds() {
+        const checkedBoxes = document.querySelectorAll('.article-checkbox:checked');
+        selectedArticleIds = Array.from(checkedBoxes).map(checkbox => parseInt(checkbox.getAttribute('data-id')));
+        
+        // 更新批量删除按钮状态
+        const batchDeleteBtn = document.getElementById('batchDeleteBtn');
+        if (selectedArticleIds.length > 0) {
+          batchDeleteBtn.classList.remove('hidden');
+          batchDeleteBtn.innerHTML = `<i class="fa fa-trash" aria-hidden="true"></i> 批量删除 (${selectedArticleIds.length})`;
+        } else {
+          batchDeleteBtn.classList.add('hidden');
+          batchDeleteBtn.innerHTML = `<i class="fa fa-trash" aria-hidden="true"></i> 批量删除`;
+        }
+      }
+      
+      // 批量删除按钮
+      document.getElementById('batchDeleteBtn').addEventListener('click', function() {
+        if (selectedArticleIds.length === 0) return;
+        
+        if (confirm(`确定要删除选中的 ${selectedArticleIds.length} 篇文章吗？此操作无法撤销。`)) {
+          batchDeleteArticles(selectedArticleIds);
+          // 重置选中状态
+          selectedArticleIds = [];
+          document.getElementById('selectAllCheckbox').checked = false;
+          document.getElementById('batchDeleteBtn').innerHTML = `<i class="fa fa-trash" aria-hidden="true"></i> 批量删除`;
+        }
+      });
+      
+      // 新建文章按钮
+      document.getElementById('addNewArticleBtn').addEventListener('click', function() {
+        // 重置表单
+        resetArticleForm();
+        
+        // 切换到写文章页面
+        document.querySelectorAll('.page-content').forEach(pageEl => {
+          pageEl.classList.add('hidden');
+        });
+        document.getElementById('writePage').classList.remove('hidden');
+        
+        // 滚动到顶部
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      });
+    }
+  </script>
+</body>
+</html>
