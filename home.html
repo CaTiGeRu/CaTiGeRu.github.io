@@ -65,8 +65,8 @@
       .scale-in {
         animation: scaleIn 0.3s ease-in-out;
       }
-      .pulse {
-        animation: pulse 1.5s infinite;
+      .loading-spinner {
+        animation: spin 1s linear infinite;
       }
     }
   </style>
@@ -113,10 +113,9 @@
       to { transform: scale(1); opacity: 1; }
     }
     
-    @keyframes pulse {
-      0% { opacity: 1; }
-      50% { opacity: 0.5; }
-      100% { opacity: 1; }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
     }
     
     /* 编辑器样式 */
@@ -152,21 +151,6 @@
     .sort-btn.active .sort-icon {
       transform: rotate(180deg);
     }
-    
-    /* 加载状态 */
-    .loading-indicator {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 3px solid rgba(255,255,255,.3);
-      border-radius: 50%;
-      border-top-color: white;
-      animation: spin 1s ease-in-out infinite;
-    }
-    
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
   </style>
 </head>
 
@@ -174,7 +158,7 @@
   <!-- 导航栏 -->
   <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-sm shadow-sm transition-all duration-300">
     <nav class="container mx-auto px-4 py-4 flex justify-between items-center">
-      <a href="#" class="text-xl font-bold text-orange-dark flex items-center gap-2">
+      <a href="https://catigeru.github.io/home.html" class="text-xl font-bold text-orange-dark flex items-center gap-2">
         <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
         <span>大柯的blog</span>
       </a>
@@ -219,6 +203,14 @@
     </div>
   </header>
 
+  <!-- 加载指示器 -->
+  <div id="loadingIndicator" class="fixed inset-0 bg-white/80 z-50 flex items-center justify-center hidden">
+    <div class="text-center">
+      <div class="inline-block w-12 h-12 border-4 border-orange-light border-t-orange rounded-full loading-spinner mb-4"></div>
+      <p class="text-neutral-700">加载中...</p>
+    </div>
+  </div>
+
   <main>
     <!-- 页面容器 - 所有页面内容都在这里切换显示 -->
     <div id="pageContainer">
@@ -244,14 +236,8 @@
             </div>
           </div>
           
-          <!-- 加载指示器 -->
-          <div id="articlesLoading" class="col-span-full text-center py-16">
-            <div class="loading-indicator mx-auto mb-4"></div>
-            <p class="text-neutral-600 text-lg">加载文章中...</p>
-          </div>
-          
           <!-- 文章网格 -->
-          <div id="articlesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 hidden">
+          <div id="articlesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <!-- 文章将通过JavaScript动态加载 -->
             <div id="noArticles" class="col-span-full text-center py-16 hidden">
               <i class="fa fa-file-text-o text-6xl text-neutral-300 mb-4" aria-hidden="true"></i>
@@ -260,15 +246,6 @@
                 <i class="fa fa-pencil mr-1" aria-hidden="true"></i> 写第一篇文章
               </a>
             </div>
-          </div>
-          
-          <!-- 加载错误提示 -->
-          <div id="articlesError" class="col-span-full text-center py-16 hidden">
-            <i class="fa fa-exclamation-circle text-6xl text-red-400 mb-4" aria-hidden="true"></i>
-            <p class="text-neutral-600 text-lg">加载文章失败</p>
-            <button id="retryLoadArticles" class="mt-4 px-4 py-2 bg-orange hover:bg-orange-dark text-white rounded-lg transition-colors">
-              重试
-            </button>
           </div>
           
           <!-- 加载更多按钮 -->
@@ -302,6 +279,20 @@
               <i class="fa fa-arrow-left" aria-hidden="true"></i> 返回首页
             </a>
             <h2 class="text-2xl font-bold">写文章</h2>
+          </div>
+          
+          <!-- GitHub Pages 限制提示 -->
+          <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <i class="fa fa-info-circle text-yellow-500" aria-hidden="true"></i>
+              </div>
+              <div class="ml-3">
+                <p class="text-sm text-yellow-700">
+                  注意：在GitHub Pages上，文章编辑功能仅为演示。实际发布需手动更新passage.json文件。
+                </p>
+              </div>
+            </div>
           </div>
           
           <form id="articleForm" class="bg-white rounded-xl shadow-md p-6 md:p-8">
@@ -377,11 +368,7 @@
                 预览
               </button>
               <button type="submit" class="px-6 py-3 bg-orange hover:bg-orange-dark text-white rounded-full font-medium transition-colors">
-                <span id="submitBtnText">发布文章</span> 
-                <span id="saveLoadingIndicator" class="hidden">
-                  <div class="loading-indicator inline-block ml-2" style="width:16px;height:16px;"></div>
-                </span>
-                <i class="fa fa-paper-plane ml-1" aria-hidden="true" id="saveIcon"></i>
+                <span id="submitBtnText">发布文章</span> <i class="fa fa-paper-plane ml-1" aria-hidden="true"></i>
               </button>
             </div>
           </form>
@@ -396,6 +383,20 @@
               <i class="fa fa-arrow-left" aria-hidden="true"></i> 返回首页
             </a>
             <h2 class="text-2xl font-bold">管理文章</h2>
+          </div>
+          
+          <!-- GitHub Pages 限制提示 -->
+          <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <i class="fa fa-info-circle text-yellow-500" aria-hidden="true"></i>
+              </div>
+              <div class="ml-3">
+                <p class="text-sm text-yellow-700">
+                  注意：在GitHub Pages上，删除和编辑功能仅为演示。实际修改需手动更新passage.json文件。
+                </p>
+              </div>
+            </div>
           </div>
           
           <div class="bg-white rounded-xl shadow-md p-6 md:p-8">
@@ -439,14 +440,8 @@
               </div>
             </div>
             
-            <!-- 加载指示器 -->
-            <div id="manageLoading" class="text-center py-16">
-              <div class="loading-indicator mx-auto mb-4"></div>
-              <p class="text-neutral-600 text-lg">加载文章中...</p>
-            </div>
-            
             <!-- 文章管理表格 -->
-            <div id="manageTableContainer" class="overflow-x-auto hidden">
+            <div class="overflow-x-auto">
               <table class="w-full manage-table">
                 <thead>
                   <tr class="border-b-2 border-neutral-200">
@@ -470,15 +465,6 @@
                   </tr>
                 </tbody>
               </table>
-            </div>
-            
-            <!-- 加载错误提示 -->
-            <div id="manageError" class="text-center py-16 hidden">
-              <i class="fa fa-exclamation-circle text-4xl text-red-400 mb-4" aria-hidden="true"></i>
-              <p class="text-neutral-600">加载文章失败</p>
-              <button id="retryLoadManage" class="mt-4 px-4 py-2 bg-orange hover:bg-orange-dark text-white rounded-lg transition-colors">
-                重试
-              </button>
             </div>
             
             <!-- 分页 -->
@@ -521,16 +507,14 @@
             <h3 class="text-xl font-bold text-red-500">确认删除</h3>
           </div>
           <div class="p-6">
-            <p class="mb-6">你确定要删除这篇文章吗？此操作无法撤销。</p>
+            <p class="mb-4">你确定要删除这篇文章吗？</p>
+            <p class="mb-6 text-sm text-yellow-600">在GitHub Pages上，此操作仅为演示，不会实际删除文件。</p>
             <div class="flex justify-end gap-3">
               <button id="cancelDeleteBtn" class="px-4 py-2 border border-neutral-300 rounded-lg text-neutral-700 hover:bg-neutral-100 transition-colors">
                 取消
               </button>
               <button id="confirmDeleteBtn" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors">
-                <span id="deleteBtnText">确认删除</span>
-                <span id="deleteLoadingIndicator" class="hidden">
-                  <div class="loading-indicator inline-block ml-2" style="width:16px;height:16px;border-top-color:white;border-color:rgba(255,255,255,0.3);"></div>
-                </span>
+                确认删除
               </button>
             </div>
           </div>
@@ -696,139 +680,118 @@
   <!-- JavaScript -->
   <script>
     // 全局变量
+    let articles = []; // 存储从JSON加载的文章
     let currentSort = 'newest';
     let currentPage = 1;
     const articlesPerPage = 10;
     let selectedArticleIds = [];
     let articleToDelete = null;
-    const passagesUrl = 'catigeru.github.io/passage.json'; // 文章数据存储的JSON文件
+    const jsonFilePath = 'https://catigeru.github.io/passage.json'; // JSON文件路径
     
     // 页面加载完成后执行
     document.addEventListener('DOMContentLoaded', function() {
-      // 加载文章到首页
-      loadArticles();
-      // 设置默认排序
-      document.querySelector(`.sort-btn[data-sort="${currentSort}"]`).classList.add('active');
+      // 加载文章数据
+      loadArticlesFromJson();
       // 初始化事件监听
       initEventListeners();
+      // 设置默认排序
+      document.querySelector(`.sort-btn[data-sort="${currentSort}"]`).classList.add('active');
     });
     
-    // 获取所有文章 - 从JSON文件
-    async function getArticles() {
-      try {
-        const response = await fetch(passagesUrl);
-        if (!response.ok) {
-          // 如果文件不存在，返回空数组
-          if (response.status === 404) {
-            return [];
-          }
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        return Array.isArray(data) ? data : [];
-      } catch (error) {
-        console.error('Error fetching articles:', error);
-        throw error; // 抛出错误以便调用者处理
-      }
-    }
-    
-    // 保存文章 - 写入JSON文件
-    async function saveArticle(article) {
-      try {
-        // 先获取现有文章
-        const articles = await getArticles().catch(() => []);
-        
-        let updatedArticles;
-        if (article.id) {
-          // 更新现有文章
-          updatedArticles = articles.map(a => a.id === article.id ? article : a);
-        } else {
-          // 添加新文章
-          article.id = Date.now(); // 使用时间戳作为唯一ID
-          article.date = new Date().toISOString().split('T')[0]; // 格式化为YYYY-MM-DD
-          // 估算阅读时间（假设每分钟阅读200字）
-          const wordCount = article.content.replace(/<[^>]*>/g, '').length;
-          article.readTime = Math.ceil(wordCount / 200);
-          if (article.readTime < 1) article.readTime = 1;
-          
-          updatedArticles = [article, ...articles]; // 添加到数组开头
-        }
-        
-        // 发送PUT请求更新JSON文件
-        const response = await fetch(passagesUrl, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(updatedArticles, null, 2),
-        });
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        return article;
-      } catch (error) {
-        console.error('Error saving article:', error);
-        throw error;
-      }
-    }
-    
-    // 加载文章到首页
-    async function loadArticles(category = 'all') {
-      // 显示加载状态
-      showArticlesLoading();
+    // 从JSON文件加载文章
+    function loadArticlesFromJson() {
+      showLoading();
       
-      try {
-        const articles = await getArticles();
-        
-        // 隐藏加载状态，显示文章网格
-        hideArticlesLoading();
-        document.getElementById('articlesGrid').classList.remove('hidden');
-        
-        const articlesGrid = document.getElementById('articlesGrid');
-        const noArticles = document.getElementById('noArticles');
-        
-        // 清空现有内容
-        Array.from(articlesGrid.children).forEach(child => {
-          if (child.id !== 'noArticles') {
-            articlesGrid.removeChild(child);
+      fetch(jsonFilePath)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('网络响应不正常');
           }
+          return response.json();
+        })
+        .then(data => {
+          articles = data;
+          // 加载文章到首页
+          renderArticles();
+          // 加载文章到管理页面
+          loadManageArticles();
+          // 更新分类统计
+          updateCategoryCounts();
+          hideLoading();
+        })
+        .catch(error => {
+          console.error('加载文章失败:', error);
+          hideLoading();
+          showNotification('加载失败', '无法加载文章数据，请稍后重试', true);
+          // 显示本地示例数据作为 fallback
+          useFallbackArticles();
         });
-        
-        // 过滤文章
-        let filteredArticles = articles;
-        if (category !== 'all') {
-          filteredArticles = articles.filter(article => article.category === category);
+    }
+    
+    // 使用本地示例数据作为 fallback
+    function useFallbackArticles() {
+      articles = [
+        {
+          "id": 1,
+          "title": "前端开发效率提升的5个实用技巧",
+          "content": "<p>在日常前端开发中，掌握一些实用技巧可以显著提高工作效率。本文分享了5个经过实践验证的方法，从代码片段管理到自动化工具配置，帮助你更高效地完成开发任务。</p>",
+          "category": "技术",
+          "cover": "https://picsum.photos/600/400?random=1",
+          "date": "2023-06-15",
+          "readTime": 8
+        },
+        {
+          "id": 2,
+          "title": "如何建立健康的工作习惯",
+          "content": "<p>远程工作已经成为常态，但如何在灵活的工作环境中保持高效和健康？本文分享了我实践多年的工作习惯。</p>",
+          "category": "生活",
+          "cover": "https://picsum.photos/600/400?random=2",
+          "date": "2023-06-08",
+          "readTime": 5
         }
-        
-        if (filteredArticles.length === 0) {
-          // 没有文章时显示提示
-          noArticles.classList.remove('hidden');
-          return;
+      ];
+      
+      renderArticles();
+      loadManageArticles();
+      updateCategoryCounts();
+    }
+    
+    // 渲染首页文章
+    function renderArticles(category = 'all') {
+      const articlesGrid = document.getElementById('articlesGrid');
+      const noArticles = document.getElementById('noArticles');
+      
+      // 清空现有内容
+      Array.from(articlesGrid.children).forEach(child => {
+        if (child.id !== 'noArticles') {
+          articlesGrid.removeChild(child);
         }
-        
-        // 隐藏无文章提示
-        noArticles.classList.add('hidden');
-        
-        // 显示文章
-        filteredArticles.forEach((article, index) => {
-          // 添加延迟动画效果
-          setTimeout(() => {
-            const articleCard = createArticleCard(article);
-            articleCard.classList.add('fade-in', 'slide-up');
-            articlesGrid.appendChild(articleCard);
-          }, index * 100);
-        });
-        
-        // 更新分类统计
-        updateCategoryCounts(articles);
-        
-      } catch (error) {
-        console.error('Error loading articles:', error);
-        // 显示错误状态
-        showArticlesError();
+      });
+      
+      // 过滤文章
+      let filteredArticles = articles;
+      if (category !== 'all') {
+        filteredArticles = articles.filter(article => article.category === category);
       }
+      
+      if (filteredArticles.length === 0) {
+        // 没有文章时显示提示
+        noArticles.classList.remove('hidden');
+        return;
+      }
+      
+      // 隐藏无文章提示
+      noArticles.classList.add('hidden');
+      
+      // 显示文章
+      filteredArticles.forEach((article, index) => {
+        // 添加延迟动画效果
+        setTimeout(() => {
+          const articleCard = createArticleCard(article);
+          articleCard.classList.add('fade-in', 'slide-up');
+          articlesGrid.appendChild(articleCard);
+        }, index * 100);
+      });
     }
     
     // 创建文章卡片
@@ -884,110 +847,92 @@
     }
     
     // 加载文章到管理页面
-    async function loadManageArticles(searchQuery = '') {
-      // 显示加载状态
-      showManageLoading();
+    function loadManageArticles(searchQuery = '') {
+      let filteredArticles = [...articles];
+      const tableBody = document.getElementById('manageArticlesTable');
+      const noArticlesManage = document.getElementById('noArticlesManage');
       
-      try {
-        let articles = await getArticles();
-        
-        // 隐藏加载状态，显示表格
-        hideManageLoading();
-        document.getElementById('manageTableContainer').classList.remove('hidden');
-        
-        const tableBody = document.getElementById('manageArticlesTable');
-        const noArticlesManage = document.getElementById('noArticlesManage');
-        
-        // 清空现有内容
-        Array.from(tableBody.children).forEach(child => {
-          if (child.id !== 'noArticlesManage') {
-            tableBody.removeChild(child);
-          }
-        });
-        
-        // 搜索过滤
-        if (searchQuery) {
-          const query = searchQuery.toLowerCase();
-          articles = articles.filter(article => 
-            article.title.toLowerCase().includes(query) || 
-            article.category.toLowerCase().includes(query) ||
-            article.content.replace(/<[^>]*>/g, '').toLowerCase().includes(query)
-          );
+      // 清空现有内容
+      Array.from(tableBody.children).forEach(child => {
+        if (child.id !== 'noArticlesManage') {
+          tableBody.removeChild(child);
         }
-        
-        // 排序
-        articles = sortArticles([...articles], currentSort);
-        
-        // 分页处理
-        const totalArticles = articles.length;
-        const totalPages = Math.ceil(totalArticles / articlesPerPage);
-        const startIndex = (currentPage - 1) * articlesPerPage;
-        const endIndex = startIndex + articlesPerPage;
-        const paginatedArticles = articles.slice(startIndex, endIndex);
-        
-        // 更新分页信息
-        document.getElementById('showingCount').textContent = paginatedArticles.length;
-        document.getElementById('totalCount').textContent = totalArticles;
-        
-        // 更新分页按钮状态
-        document.getElementById('prevPageBtn').disabled = currentPage === 1;
-        document.getElementById('nextPageBtn').disabled = currentPage === totalPages || totalPages === 0;
-        
-        if (totalArticles === 0) {
-          // 没有文章时显示提示
-          noArticlesManage.classList.remove('hidden');
-          document.getElementById('batchDeleteBtn').classList.add('hidden');
-          return;
-        }
-        
-        // 隐藏无文章提示
-        noArticlesManage.classList.add('hidden');
-        
-        // 显示批量删除按钮（如果有文章）
-        document.getElementById('batchDeleteBtn').classList.remove('hidden');
-        
-        // 显示文章
-        paginatedArticles.forEach(article => {
-          const row = document.createElement('tr');
-          row.className = 'border-b border-neutral-200';
-          row.innerHTML = `
-            <td class="py-3 px-4">
-              <input type="checkbox" class="article-checkbox rounded text-orange focus:ring-orange" data-id="${article.id}">
-            </td>
-            <td class="py-3 px-4">
-              <div class="font-medium hover:text-orange transition-colors">${article.title}</div>
-            </td>
-            <td class="py-3 px-4 hidden md:table-cell">
-              <span class="bg-orange-light text-orange px-2 py-1 rounded-full text-sm">${article.category}</span>
-            </td>
-            <td class="py-3 px-4 hidden sm:table-cell text-neutral-600">${article.date}</td>
-            <td class="py-3 px-4 hidden lg:table-cell text-neutral-600">${article.readTime} 分钟</td>
-            <td class="py-3 px-4 text-right">
-              <div class="flex justify-end gap-2">
-                <button class="text-neutral-600 hover:text-orange transition-colors edit-article" data-id="${article.id}" title="编辑">
-                  <i class="fa fa-pencil" aria-hidden="true"></i>
-                </button>
-                <button class="text-neutral-600 hover:text-red-500 transition-colors delete-article" data-id="${article.id}" title="删除">
-                  <i class="fa fa-trash" aria-hidden="true"></i>
-                </button>
-              </div>
-            </td>
-          `;
-          tableBody.appendChild(row);
-        });
-        
-        // 重置选中状态
-        selectedArticleIds = [];
-        document.getElementById('selectAllCheckbox').checked = false;
-        
-        // 更新分类统计
-        updateCategoryCounts(articles);
-        
-      } catch (error) {
-        console.error('Error loading manage articles:', error);
-        // 显示错误状态
-        showManageError();
+      });
+      
+      // 搜索过滤
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        filteredArticles = filteredArticles.filter(article => 
+          article.title.toLowerCase().includes(query) || 
+          article.category.toLowerCase().includes(query) ||
+          article.content.replace(/<[^>]*>/g, '').toLowerCase().includes(query)
+        );
       }
+      
+      // 排序
+      filteredArticles = sortArticles(filteredArticles, currentSort);
+      
+      // 分页处理
+      const totalArticles = filteredArticles.length;
+      const totalPages = Math.ceil(totalArticles / articlesPerPage);
+      const startIndex = (currentPage - 1) * articlesPerPage;
+      const endIndex = startIndex + articlesPerPage;
+      const paginatedArticles = filteredArticles.slice(startIndex, endIndex);
+      
+      // 更新分页信息
+      document.getElementById('showingCount').textContent = paginatedArticles.length;
+      document.getElementById('totalCount').textContent = totalArticles;
+      
+      // 更新分页按钮状态
+      document.getElementById('prevPageBtn').disabled = currentPage === 1;
+      document.getElementById('nextPageBtn').disabled = currentPage === totalPages || totalPages === 0;
+      
+      if (totalArticles === 0) {
+        // 没有文章时显示提示
+        noArticlesManage.classList.remove('hidden');
+        document.getElementById('batchDeleteBtn').classList.add('hidden');
+        return;
+      }
+      
+      // 隐藏无文章提示
+      noArticlesManage.classList.add('hidden');
+      
+      // 显示批量删除按钮（如果有文章）
+      document.getElementById('batchDeleteBtn').classList.remove('hidden');
+      
+      // 显示文章
+      paginatedArticles.forEach(article => {
+        const row = document.createElement('tr');
+        row.className = 'border-b border-neutral-200';
+        row.innerHTML = `
+          <td class="py-3 px-4">
+            <input type="checkbox" class="article-checkbox rounded text-orange focus:ring-orange" data-id="${article.id}">
+          </td>
+          <td class="py-3 px-4">
+            <div class="font-medium hover:text-orange transition-colors">${article.title}</div>
+          </td>
+          <td class="py-3 px-4 hidden md:table-cell">
+            <span class="bg-orange-light text-orange px-2 py-1 rounded-full text-sm">${article.category}</span>
+          </td>
+          <td class="py-3 px-4 hidden sm:table-cell text-neutral-600">${article.date}</td>
+          <td class="py-3 px-4 hidden lg:table-cell text-neutral-600">${article.readTime} 分钟</td>
+          <td class="py-3 px-4 text-right">
+            <div class="flex justify-end gap-2">
+              <button class="text-neutral-600 hover:text-orange transition-colors edit-article" data-id="${article.id}" title="编辑">
+                <i class="fa fa-pencil" aria-hidden="true"></i>
+              </button>
+              <button class="text-neutral-600 hover:text-red-500 transition-colors delete-article" data-id="${article.id}" title="删除">
+                <i class="fa fa-trash" aria-hidden="true"></i>
+              </button>
+            </div>
+          </td>
+        `;
+        tableBody.appendChild(row);
+      });
+      
+      // 重置选中状态
+      selectedArticleIds = [];
+      document.getElementById('selectAllCheckbox').checked = false;
     }
     
     // 排序文章
@@ -1009,7 +954,7 @@
     }
     
     // 更新分类统计
-    function updateCategoryCounts(articles) {
+    function updateCategoryCounts() {
       const counts = {
         '技术': 0,
         '生活': 0,
@@ -1063,127 +1008,14 @@
       notification.classList.add('translate-x-full');
     }
     
-    // 删除文章
-    async function deleteArticle(id) {
-      try {
-        // 显示删除加载状态
-        document.getElementById('deleteBtnText').classList.add('hidden');
-        document.getElementById('deleteLoadingIndicator').classList.remove('hidden');
-        
-        // 获取现有文章
-        const articles = await getArticles();
-        
-        // 过滤掉要删除的文章
-        const updatedArticles = articles.filter(a => a.id !== id);
-        
-        // 发送PUT请求更新JSON文件
-        const response = await fetch(passagesUrl, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(updatedArticles, null, 2),
-        });
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        // 隐藏删除加载状态
-        document.getElementById('deleteBtnText').classList.remove('hidden');
-        document.getElementById('deleteLoadingIndicator').classList.add('hidden');
-        
-        // 关闭删除模态框
-        document.getElementById('deleteConfirmModal').classList.add('hidden');
-        
-        // 重新加载文章列表
-        loadArticles();
-        loadManageArticles(document.getElementById('manageSearchInput').value);
-        
-        showNotification('成功', '文章已删除');
-        
-      } catch (error) {
-        console.error('Error deleting article:', error);
-        // 隐藏删除加载状态
-        document.getElementById('deleteBtnText').classList.remove('hidden');
-        document.getElementById('deleteLoadingIndicator').classList.add('hidden');
-        
-        showNotification('错误', '删除文章失败', true);
-      }
+    // 显示加载指示器
+    function showLoading() {
+      document.getElementById('loadingIndicator').classList.remove('hidden');
     }
     
-    // 批量删除文章
-    async function batchDeleteArticles(ids) {
-      if (ids.length === 0) return;
-      
-      try {
-        // 获取现有文章
-        const articles = await getArticles();
-        
-        // 过滤掉要删除的文章
-        const updatedArticles = articles.filter(a => !ids.includes(a.id));
-        
-        // 发送PUT请求更新JSON文件
-        const response = await fetch(passagesUrl, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(updatedArticles, null, 2),
-        });
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        // 重新加载文章列表
-        loadArticles();
-        loadManageArticles(document.getElementById('manageSearchInput').value);
-        
-        showNotification('成功', `已删除 ${ids.length} 篇文章`);
-        
-      } catch (error) {
-        console.error('Error batch deleting articles:', error);
-        showNotification('错误', '批量删除失败', true);
-      }
-    }
-    
-    // 显示文章加载状态
-    function showArticlesLoading() {
-      document.getElementById('articlesLoading').classList.remove('hidden');
-      document.getElementById('articlesGrid').classList.add('hidden');
-      document.getElementById('articlesError').classList.add('hidden');
-    }
-    
-    // 隐藏文章加载状态
-    function hideArticlesLoading() {
-      document.getElementById('articlesLoading').classList.add('hidden');
-    }
-    
-    // 显示文章加载错误
-    function showArticlesError() {
-      document.getElementById('articlesLoading').classList.add('hidden');
-      document.getElementById('articlesGrid').classList.add('hidden');
-      document.getElementById('articlesError').classList.remove('hidden');
-    }
-    
-    // 显示管理页面加载状态
-    function showManageLoading() {
-      document.getElementById('manageLoading').classList.remove('hidden');
-      document.getElementById('manageTableContainer').classList.add('hidden');
-      document.getElementById('manageError').classList.add('hidden');
-    }
-    
-    // 隐藏管理页面加载状态
-    function hideManageLoading() {
-      document.getElementById('manageLoading').classList.add('hidden');
-    }
-    
-    // 显示管理页面加载错误
-    function showManageError() {
-      document.getElementById('manageLoading').classList.add('hidden');
-      document.getElementById('manageTableContainer').classList.add('hidden');
-      document.getElementById('manageError').classList.remove('hidden');
+    // 隐藏加载指示器
+    function hideLoading() {
+      document.getElementById('loadingIndicator').classList.add('hidden');
     }
     
     // 初始化事件监听
@@ -1199,7 +1031,7 @@
       
       // 页面切换
       document.querySelectorAll('[data-page]').forEach(link => {
-        link.addEventListener('click', async function(e) {
+        link.addEventListener('click', function(e) {
           e.preventDefault();
           const page = this.getAttribute('data-page');
           
@@ -1214,10 +1046,10 @@
           // 关闭移动菜单
           mobileMenu.classList.add('hidden');
           
-          // 如果切换到管理页面，加载文章
+          // 如果切换到管理页面，重新加载文章
           if (page === 'manage') {
             currentPage = 1;
-            await loadManageArticles();
+            loadManageArticles();
           }
           
           // 滚动到顶部
@@ -1258,10 +1090,10 @@
         });
       });
       
-      // 文章表单提交
+      // 文章表单提交 - GitHub Pages环境下仅做演示
       const articleForm = document.getElementById('articleForm');
       
-      articleForm.addEventListener('submit', async function(e) {
+      articleForm.addEventListener('submit', function(e) {
         e.preventDefault();
         
         // 获取表单数据
@@ -1279,46 +1111,21 @@
           return;
         }
         
-        // 显示保存加载状态
-        document.getElementById('submitBtnText').classList.add('hidden');
-        document.getElementById('saveIcon').classList.add('hidden');
-        document.getElementById('saveLoadingIndicator').classList.remove('hidden');
+        // 在GitHub Pages上仅做演示，不实际保存
+        showNotification(
+          '演示提示', 
+          '在GitHub Pages上，文章需手动更新到passage.json文件才能实际发布', 
+          false
+        );
         
-        try {
-          // 保存文章
-          const savedArticle = await saveArticle(article);
-          
-          // 重置表单
-          resetArticleForm();
-          
-          // 隐藏保存加载状态
-          document.getElementById('submitBtnText').classList.remove('hidden');
-          document.getElementById('saveIcon').classList.remove('hidden');
-          document.getElementById('saveLoadingIndicator').classList.add('hidden');
-          
-          // 显示成功通知
-          showNotification('成功', article.id ? '文章已更新' : '文章已发布');
-          
-          // 切换到首页
-          document.querySelectorAll('.page-content').forEach(pageEl => {
-            pageEl.classList.add('hidden');
-          });
-          document.getElementById('homePage').classList.remove('hidden');
-          
-          // 重新加载文章列表
-          loadArticles();
-          loadManageArticles();
-          
-        } catch (error) {
-          console.error('Error saving article:', error);
-          
-          // 隐藏保存加载状态
-          document.getElementById('submitBtnText').classList.remove('hidden');
-          document.getElementById('saveIcon').classList.remove('hidden');
-          document.getElementById('saveLoadingIndicator').classList.add('hidden');
-          
-          showNotification('错误', article.id ? '更新文章失败' : '发布文章失败', true);
-        }
+        // 重置表单
+        resetArticleForm();
+        
+        // 切换到首页
+        document.querySelectorAll('.page-content').forEach(pageEl => {
+          pageEl.classList.add('hidden');
+        });
+        document.getElementById('homePage').classList.remove('hidden');
       });
       
       // 重置文章表单
@@ -1342,7 +1149,7 @@
       
       // 分类筛选
       document.querySelectorAll('.category-filter').forEach(button => {
-        button.addEventListener('click', async function() {
+        button.addEventListener('click', function() {
           // 更新按钮样式
           document.querySelectorAll('.category-filter').forEach(btn => {
             btn.classList.remove('bg-orange', 'text-white');
@@ -1353,7 +1160,7 @@
           
           // 加载对应分类的文章
           const category = this.getAttribute('data-category');
-          await loadArticles(category);
+          renderArticles(category);
         });
       });
       
@@ -1451,40 +1258,33 @@
       });
       
       // 处理文章操作（编辑/删除）
-      async function handleArticleActions(e) {
+      function handleArticleActions(e) {
         // 编辑文章
         if (e.target.closest('.edit-article')) {
           e.preventDefault();
           const id = parseInt(e.target.closest('.edit-article').getAttribute('data-id'));
+          const article = articles.find(a => a.id === id);
           
-          try {
-            const articles = await getArticles();
-            const article = articles.find(a => a.id === id);
+          if (article) {
+            // 填充表单
+            document.getElementById('articleId').value = article.id;
+            document.getElementById('articleTitle').value = article.title;
+            document.getElementById('articleCategory').value = article.category;
+            document.getElementById('articleCover').value = article.cover || '';
+            document.getElementById('articleContent').innerHTML = article.content;
+            document.getElementById('submitBtnText').textContent = '更新文章';
             
-            if (article) {
-              // 填充表单
-              document.getElementById('articleId').value = article.id;
-              document.getElementById('articleTitle').value = article.title;
-              document.getElementById('articleCategory').value = article.category;
-              document.getElementById('articleCover').value = article.cover || '';
-              document.getElementById('articleContent').innerHTML = article.content;
-              document.getElementById('submitBtnText').textContent = '更新文章';
-              
-              // 切换到写文章页面
-              document.querySelectorAll('.page-content').forEach(pageEl => {
-                pageEl.classList.add('hidden');
-              });
-              document.getElementById('writePage').classList.remove('hidden');
-              
-              // 滚动到顶部
-              window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-              });
-            }
-          } catch (error) {
-            console.error('Error loading article for edit:', error);
-            showNotification('错误', '加载文章失败', true);
+            // 切换到写文章页面
+            document.querySelectorAll('.page-content').forEach(pageEl => {
+              pageEl.classList.add('hidden');
+            });
+            document.getElementById('writePage').classList.remove('hidden');
+            
+            // 滚动到顶部
+            window.scrollTo({
+              top: 0,
+              behavior: 'smooth'
+            });
           }
         }
         
@@ -1507,8 +1307,15 @@
       
       document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
         if (articleToDelete !== null) {
-          deleteArticle(articleToDelete);
+          // 在GitHub Pages上仅做演示，不实际删除
+          showNotification(
+            '演示提示', 
+            '在GitHub Pages上，文章需手动从passage.json文件中删除', 
+            false
+          );
         }
+        document.getElementById('deleteConfirmModal').classList.add('hidden');
+        articleToDelete = null;
       });
       
       // 点击删除模态框外部关闭
@@ -1521,7 +1328,7 @@
       
       // 排序按钮事件
       document.querySelectorAll('.sort-btn').forEach(button => {
-        button.addEventListener('click', async function() {
+        button.addEventListener('click', function() {
           const sortType = this.getAttribute('data-sort');
           
           // 更新按钮样式
@@ -1533,39 +1340,34 @@
           // 更新排序方式并重新加载文章
           currentSort = sortType;
           currentPage = 1; // 重置到第一页
-          await loadManageArticles(document.getElementById('manageSearchInput').value);
+          loadManageArticles(document.getElementById('manageSearchInput').value);
         });
       });
       
       // 搜索功能
       const searchInput = document.getElementById('manageSearchInput');
-      searchInput.addEventListener('input', async function() {
+      searchInput.addEventListener('input', function() {
         currentPage = 1; // 重置到第一页
-        await loadManageArticles(this.value);
+        loadManageArticles(this.value);
       });
       
       // 分页按钮
-      document.getElementById('prevPageBtn').addEventListener('click', async function() {
+      document.getElementById('prevPageBtn').addEventListener('click', function() {
         if (currentPage > 1) {
           currentPage--;
-          await loadManageArticles(searchInput.value);
+          loadManageArticles(searchInput.value);
           scrollToTopOfManageTable();
         }
       });
       
-      document.getElementById('nextPageBtn').addEventListener('click', async function() {
-        try {
-          const articles = await getArticles();
-          const totalArticles = articles.length;
-          const totalPages = Math.ceil(totalArticles / articlesPerPage);
-          
-          if (currentPage < totalPages) {
-            currentPage++;
-            await loadManageArticles(searchInput.value);
-            scrollToTopOfManageTable();
-          }
-        } catch (error) {
-          console.error('Error loading articles for pagination:', error);
+      document.getElementById('nextPageBtn').addEventListener('click', function() {
+        const totalArticles = articles.length;
+        const totalPages = Math.ceil(totalArticles / articlesPerPage);
+        
+        if (currentPage < totalPages) {
+          currentPage++;
+          loadManageArticles(searchInput.value);
+          scrollToTopOfManageTable();
         }
       });
       
@@ -1627,13 +1429,18 @@
       document.getElementById('batchDeleteBtn').addEventListener('click', function() {
         if (selectedArticleIds.length === 0) return;
         
-        if (confirm(`确定要删除选中的 ${selectedArticleIds.length} 篇文章吗？此操作无法撤销。`)) {
-          batchDeleteArticles(selectedArticleIds);
-          // 重置选中状态
-          selectedArticleIds = [];
-          document.getElementById('selectAllCheckbox').checked = false;
-          document.getElementById('batchDeleteBtn').innerHTML = `<i class="fa fa-trash" aria-hidden="true"></i> 批量删除`;
-        }
+        // 在GitHub Pages上仅做演示，不实际删除
+        showNotification(
+          '演示提示', 
+          `在GitHub Pages上，需手动从passage.json文件中删除选中的 ${selectedArticleIds.length} 篇文章`, 
+          false
+        );
+        
+        // 重置选中状态
+        selectedArticleIds = [];
+        document.getElementById('selectAllCheckbox').checked = false;
+        document.getElementById('batchDeleteBtn').innerHTML = `<i class="fa fa-trash" aria-hidden="true"></i> 批量删除`;
+        document.getElementById('batchDeleteBtn').classList.add('hidden');
       });
       
       // 新建文章按钮
@@ -1652,16 +1459,6 @@
           top: 0,
           behavior: 'smooth'
         });
-      });
-      
-      // 重试加载文章按钮
-      document.getElementById('retryLoadArticles').addEventListener('click', async function() {
-        await loadArticles();
-      });
-      
-      // 重试加载管理文章按钮
-      document.getElementById('retryLoadManage').addEventListener('click', async function() {
-        await loadManageArticles();
       });
     }
   </script>
