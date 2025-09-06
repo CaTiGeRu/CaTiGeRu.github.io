@@ -1,13 +1,947 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width">
-  <title>CaTiGeRu's Blog</title>
-  <t>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>大柯的blog</title>
+  <!-- 引入Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 引入Font Awesome -->
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  
+  <!-- 配置Tailwind自定义颜色和字体 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            orange: {
+              light: '#FFE0B2',
+              DEFAULT: '#FF9800',
+              dark: '#E65100',
+            },
+            neutral: {
+              100: '#F5F5F5',
+              200: '#EEEEEE',
+              300: '#E0E0E0',
+              600: '#757575',
+              700: '#616161',
+              800: '#424242',
+              900: '#212121',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  
+  <!-- 自定义工具类 -->
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .text-shadow {
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+      .card-hover {
+        transition: all 0.3s ease;
+      }
+      .card-hover:hover {
+        transform: translateY(-5px);
+      }
+      .fade-in {
+        animation: fadeIn 0.5s ease-in-out;
+      }
+      .slide-up {
+        animation: slideUp 0.5s ease-out;
+      }
+    }
+  </style>
+  
+  <style>
+    /* 导入Inter字体 */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    /* 平滑滚动 */
+    html {
+      scroll-behavior: smooth;
+    }
+    
+    /* 渐变背景动画 */
+    .gradient-bg {
+      background: linear-gradient(135deg, #FF9800 0%, #E65100 100%);
+      background-size: 200% 200%;
+      animation: gradientShift 8s ease infinite;
+    }
+    
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
+    /* 编辑器样式 */
+    .editor-toolbar button {
+      transition: all 0.2s ease;
+    }
+    
+    .editor-toolbar button:hover {
+      background-color: #FFE0B2;
+      transform: scale(1.1);
+    }
+    
+    .editor-content:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(255, 152, 0, 0.3);
+    }
+  </style>
 </head>
-<body>
-  <h1>CaTiGeRu's Blog</h1>
-  <a href = "https://catigeru.github.io/home"> home </a>
+
+<body class="bg-neutral-100 font-sans text-neutral-800">
+  <!-- 导航栏 -->
+  <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-sm shadow-sm transition-all duration-300">
+    <nav class="container mx-auto px-4 py-4 flex justify-between items-center">
+      <a href="#" class="text-xl font-bold text-orange-dark flex items-center gap-2">
+        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+        <span>大柯的blog</span>
+      </a>
+      
+      <!-- 桌面导航 -->
+      <div class="hidden md:flex items-center gap-6">
+        <a href="#" class="font-medium hover:text-orange transition-colors" data-page="home">首页</a>
+        <a href="#" class="font-medium hover:text-orange transition-colors" data-page="categories">分类</a>
+        <a href="#" class="font-medium hover:text-orange transition-colors" data-page="about">关于</a>
+        <a href="#" class="font-medium hover:text-orange transition-colors" data-page="write">
+          <i class="fa fa-plus-circle mr-1" aria-hidden="true"></i> 写文章
+        </a>
+        <button class="bg-orange hover:bg-orange-dark text-white px-4 py-2 rounded-full transition-colors">
+          <i class="fa fa-search mr-1" aria-hidden="true"></i> 搜索
+        </button>
+      </div>
+      
+      <!-- 移动端菜单按钮 -->
+      <button class="md:hidden text-neutral-800 hover:text-orange transition-colors" id="menuBtn">
+        <i class="fa fa-bars text-xl" aria-hidden="true"></i>
+      </button>
+    </nav>
+    
+    <!-- 移动端导航菜单 -->
+    <div class="md:hidden hidden bg-white border-t" id="mobileMenu">
+      <div class="container mx-auto px-4 py-3 flex flex-col gap-3">
+        <a href="#" class="py-2 font-medium hover:text-orange transition-colors" data-page="home">首页</a>
+        <a href="#" class="py-2 font-medium hover:text-orange transition-colors" data-page="categories">分类</a>
+        <a href="#" class="py-2 font-medium hover:text-orange transition-colors" data-page="about">关于</a>
+        <a href="#" class="py-2 font-medium hover:text-orange transition-colors" data-page="write">
+          <i class="fa fa-plus-circle mr-1" aria-hidden="true"></i> 写文章
+        </a>
+        <div class="relative">
+          <input type="text" placeholder="搜索文章..." class="w-full px-4 py-2 rounded-full border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-orange/50">
+          <button class="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-600">
+            <i class="fa fa-search" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- 页面容器 - 所有页面内容都在这里切换显示 -->
+    <div id="pageContainer">
+      <!-- 首页内容 -->
+      <div id="homePage" class="page-content">
+        <!-- 博客标题区域 -->
+        <section class="gradient-bg text-white py-16 md:py-24">
+          <div class="container mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-6xl font-bold mb-4 text-shadow">大柯的blog</h1>
+            <p class="text-lg md:text-xl max-w-2xl mx-auto opacity-90">分享生活、技术与思考的个人空间</p>
+          </div>
+        </section>
+        
+        <!-- 文章列表区域 -->
+        <section class="container mx-auto px-4 py-12">
+          <div class="flex justify-between items-center mb-8 flex-wrap gap-4">
+            <h2 class="text-2xl font-bold text-neutral-800">最新文章</h2>
+            <div class="flex gap-2">
+              <button class="px-3 py-1 rounded-full bg-orange text-white text-sm category-filter" data-category="all">全部</button>
+              <button class="px-3 py-1 rounded-full bg-white border border-neutral-300 hover:border-orange hover:text-orange text-sm transition-colors category-filter" data-category="技术">技术</button>
+              <button class="px-3 py-1 rounded-full bg-white border border-neutral-300 hover:border-orange hover:text-orange text-sm transition-colors category-filter" data-category="生活">生活</button>
+              <button class="px-3 py-1 rounded-full bg-white border border-neutral-300 hover:border-orange hover:text-orange text-sm transition-colors category-filter" data-category="思考">思考</button>
+            </div>
+          </div>
+          
+          <!-- 文章网格 -->
+          <div id="articlesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- 文章将通过JavaScript动态加载 -->
+            <div id="noArticles" class="col-span-full text-center py-16 hidden">
+              <i class="fa fa-file-text-o text-6xl text-neutral-300 mb-4" aria-hidden="true"></i>
+              <p class="text-neutral-600 text-lg">还没有发布任何文章</p>
+              <a href="#" class="inline-block mt-4 text-orange hover:underline font-medium" data-page="write">
+                <i class="fa fa-pencil mr-1" aria-hidden="true"></i> 写第一篇文章
+              </a>
+            </div>
+          </div>
+          
+          <!-- 加载更多按钮 -->
+          <div class="mt-12 text-center">
+            <button id="loadMoreBtn" class="px-6 py-3 bg-white border-2 border-orange text-orange rounded-full font-medium hover:bg-orange hover:text-white transition-colors duration-300 hidden">
+              加载更多文章 <i class="fa fa-refresh ml-2" aria-hidden="true"></i>
+            </button>
+          </div>
+        </section>
+        
+        <!-- 订阅区域 -->
+        <section class="bg-orange-light py-12 mt-12">
+          <div class="container mx-auto px-4 text-center">
+            <h2 class="text-2xl font-bold mb-3">订阅我的博客更新</h2>
+            <p class="text-neutral-700 mb-6 max-w-md mx-auto">第一时间获取最新文章和独家内容，不会发送垃圾邮件</p>
+            <div class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+              <input type="email" placeholder="输入你的邮箱地址" class="flex-1 px-4 py-3 rounded-full focus:outline-none focus:ring-2 focus:ring-orange">
+              <button class="bg-orange hover:bg-orange-dark text-white px-6 py-3 rounded-full font-medium transition-colors">
+                订阅 <i class="fa fa-paper-plane ml-1" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
+      
+      <!-- 写文章页面 -->
+      <div id="writePage" class="page-content hidden py-12">
+        <div class="container mx-auto px-4 max-w-4xl">
+          <div class="flex items-center mb-8">
+            <a href="#" class="text-neutral-600 hover:text-orange mr-4 transition-colors" data-page="home">
+              <i class="fa fa-arrow-left" aria-hidden="true"></i> 返回首页
+            </a>
+            <h2 class="text-2xl font-bold">写文章</h2>
+          </div>
+          
+          <form id="articleForm" class="bg-white rounded-xl shadow-md p-6 md:p-8">
+            <div class="mb-6">
+              <label for="articleTitle" class="block text-neutral-700 font-medium mb-2">标题</label>
+              <input type="text" id="articleTitle" name="title" 
+                     class="w-full px-4 py-3 rounded-lg border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-orange focus:border-transparent"
+                     placeholder="输入文章标题..." required>
+            </div>
+            
+            <div class="mb-6">
+              <label for="articleCategory" class="block text-neutral-700 font-medium mb-2">分类</label>
+              <select id="articleCategory" name="category" 
+                      class="w-full px-4 py-3 rounded-lg border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-orange focus:border-transparent"
+                      required>
+                <option value="">选择分类</option>
+                <option value="技术">技术</option>
+                <option value="生活">生活</option>
+                <option value="思考">思考</option>
+                <option value="旅行">旅行</option>
+                <option value="阅读">阅读</option>
+              </select>
+            </div>
+            
+            <div class="mb-6">
+              <label for="articleCover" class="block text-neutral-700 font-medium mb-2">封面图URL</label>
+              <input type="url" id="articleCover" name="cover" 
+                     class="w-full px-4 py-3 rounded-lg border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-orange focus:border-transparent"
+                     placeholder="输入图片URL...">
+              <p class="text-sm text-neutral-500 mt-1">建议尺寸：600x400px，支持网络图片URL</p>
+            </div>
+            
+            <div class="mb-6">
+              <label class="block text-neutral-700 font-medium mb-2">内容编辑</label>
+              
+              <!-- 编辑器工具栏 -->
+              <div class="editor-toolbar flex flex-wrap gap-2 p-3 bg-neutral-100 rounded-t-lg border border-b-0 border-neutral-300">
+                <button type="button" data-action="bold" title="加粗">
+                  <i class="fa fa-bold" aria-hidden="true"></i>
+                </button>
+                <button type="button" data-action="italic" title="斜体">
+                  <i class="fa fa-italic" aria-hidden="true"></i>
+                </button>
+                <button type="button" data-action="link" title="插入链接">
+                  <i class="fa fa-link" aria-hidden="true"></i>
+                </button>
+                <button type="button" data-action="image" title="插入图片">
+                  <i class="fa fa-image" aria-hidden="true"></i>
+                </button>
+                <button type="button" data-action="heading" title="标题">
+                  <i class="fa fa-header" aria-hidden="true"></i>
+                </button>
+                <button type="button" data-action="list" title="列表">
+                  <i class="fa fa-list-ul" aria-hidden="true"></i>
+                </button>
+              </div>
+              
+              <!-- 编辑器内容区 -->
+              <div id="articleContent" class="editor-content w-full min-h-[300px] px-4 py-3 rounded-b-lg border border-neutral-300 focus:outline-none"
+                   contenteditable="true" placeholder="开始撰写文章内容..."></div>
+            </div>
+            
+            <div class="flex justify-end gap-4">
+              <button type="button" id="previewBtn" class="px-6 py-3 bg-white border border-neutral-300 text-neutral-700 rounded-full font-medium hover:bg-neutral-100 transition-colors">
+                预览
+              </button>
+              <button type="submit" class="px-6 py-3 bg-orange hover:bg-orange-dark text-white rounded-full font-medium transition-colors">
+                发布文章 <i class="fa fa-paper-plane ml-1" aria-hidden="true"></i>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+      
+      <!-- 文章预览模态框 -->
+      <div id="previewModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden fade-in">
+        <div class="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto m-4">
+          <div class="p-6 border-b border-neutral-200 flex justify-between items-center">
+            <h3 class="text-xl font-bold">文章预览</h3>
+            <button id="closePreviewBtn" class="text-neutral-500 hover:text-neutral-800 transition-colors">
+              <i class="fa fa-times text-xl" aria-hidden="true"></i>
+            </button>
+          </div>
+          <div id="previewContent" class="p-6">
+            <!-- 预览内容将通过JavaScript动态生成 -->
+          </div>
+        </div>
+      </div>
+      
+      <!-- 分类页面 -->
+      <div id="categoriesPage" class="page-content hidden py-12">
+        <div class="container mx-auto px-4">
+          <div class="flex items-center mb-8">
+            <a href="#" class="text-neutral-600 hover:text-orange mr-4 transition-colors" data-page="home">
+              <i class="fa fa-arrow-left" aria-hidden="true"></i> 返回首页
+            </a>
+            <h2 class="text-2xl font-bold">文章分类</h2>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white rounded-xl shadow-md p-6 text-center card-hover">
+              <div class="w-16 h-16 bg-orange-light rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fa fa-code text-2xl text-orange" aria-hidden="true"></i>
+              </div>
+              <h3 class="text-xl font-bold mb-2">技术</h3>
+              <p class="text-neutral-600 mb-4">关于编程、开发工具和技术趋势的文章</p>
+              <p class="text-orange font-medium"><span id="techCount">0</span> 篇文章</p>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-md p-6 text-center card-hover">
+              <div class="w-16 h-16 bg-orange-light rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fa fa-coffee text-2xl text-orange" aria-hidden="true"></i>
+              </div>
+              <h3 class="text-xl font-bold mb-2">生活</h3>
+              <p class="text-neutral-600 mb-4">记录日常生活、习惯养成和生活感悟</p>
+              <p class="text-orange font-medium"><span id="lifeCount">0</span> 篇文章</p>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-md p-6 text-center card-hover">
+              <div class="w-16 h-16 bg-orange-light rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fa fa-lightbulb-o text-2xl text-orange" aria-hidden="true"></i>
+              </div>
+              <h3 class="text-xl font-bold mb-2">思考</h3>
+              <p class="text-neutral-600 mb-4">关于职业发展、学习方法的思考与总结</p>
+              <p class="text-orange font-medium"><span id="thoughtCount">0</span> 篇文章</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 关于页面 -->
+      <div id="aboutPage" class="page-content hidden py-12">
+        <div class="container mx-auto px-4 max-w-3xl">
+          <div class="flex items-center mb-8">
+            <a href="#" class="text-neutral-600 hover:text-orange mr-4 transition-colors" data-page="home">
+              <i class="fa fa-arrow-left" aria-hidden="true"></i> 返回首页
+            </a>
+            <h2 class="text-2xl font-bold">关于我</h2>
+          </div>
+          
+          <div class="bg-white rounded-xl shadow-md p-8">
+            <div class="flex flex-col md:flex-row gap-8">
+              <div class="md:w-1/3">
+                <div class="rounded-full overflow-hidden w-40 h-40 mx-auto md:mx-0 border-4 border-orange-light">
+                  <img src="https://picsum.photos/400/400?random=10" alt="博主头像" class="w-full h-full object-cover">
+                </div>
+              </div>
+              <div class="md:w-2/3">
+                <h3 class="text-2xl font-bold mb-4">大柯</h3>
+                <p class="text-neutral-600 mb-4">
+                  热爱技术与生活的创作者，致力于分享有价值的思考和经验。
+                </p>
+                <p class="text-neutral-600 mb-4">
+                  这个博客是我记录成长、分享见解的空间，内容涵盖技术、生活、阅读等多个领域。希望通过文字与更多志同道合的朋友交流。
+                </p>
+                <div class="flex gap-4 mt-6">
+                  <a href="#" class="text-neutral-600 hover:text-orange transition-colors text-xl">
+                    <i class="fa fa-github" aria-hidden="true"></i>
+                  </a>
+                  <a href="#" class="text-neutral-600 hover:text-orange transition-colors text-xl">
+                    <i class="fa fa-twitter" aria-hidden="true"></i>
+                  </a>
+                  <a href="#" class="text-neutral-600 hover:text-orange transition-colors text-xl">
+                    <i class="fa fa-linkedin" aria-hidden="true"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="bg-neutral-800 text-white py-12">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+        <div>
+          <h3 class="text-xl font-bold mb-4 text-orange">大柯的blog</h3>
+          <p class="text-neutral-400 mb-4">分享技术、生活与思考的个人博客，记录成长的点滴。</p>
+          <div class="flex gap-4">
+            <a href="#" class="text-neutral-400 hover:text-orange transition-colors text-lg">
+              <i class="fa fa-github" aria-hidden="true"></i>
+            </a>
+            <a href="#" class="text-neutral-400 hover:text-orange transition-colors text-lg">
+              <i class="fa fa-twitter" aria-hidden="true"></i>
+            </a>
+            <a href="#" class="text-neutral-400 hover:text-orange transition-colors text-lg">
+              <i class="fa fa-linkedin" aria-hidden="true"></i>
+            </a>
+            <a href="#" class="text-neutral-400 hover:text-orange transition-colors text-lg">
+              <i class="fa fa-instagram" aria-hidden="true"></i>
+            </a>
+          </div>
+        </div>
+        
+        <div>
+          <h4 class="text-lg font-semibold mb-4">快速链接</h4>
+          <ul class="space-y-2">
+            <li><a href="#" class="text-neutral-400 hover:text-orange transition-colors" data-page="home">首页</a></li>
+            <li><a href="#" class="text-neutral-400 hover:text-orange transition-colors" data-page="categories">所有文章</a></li>
+            <li><a href="#" class="text-neutral-400 hover:text-orange transition-colors" data-page="categories">分类</a></li>
+            <li><a href="#" class="text-neutral-400 hover:text-orange transition-colors" data-page="about">关于我</a></li>
+            <li><a href="#" class="text-neutral-400 hover:text-orange transition-colors" data-page="write">写文章</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 class="text-lg font-semibold mb-4">分类</h4>
+          <ul class="space-y-2">
+            <li><a href="#" class="text-neutral-400 hover:text-orange transition-colors">技术</a></li>
+            <li><a href="#" class="text-neutral-400 hover:text-orange transition-colors">生活</a></li>
+            <li><a href="#" class="text-neutral-400 hover:text-orange transition-colors">思考</a></li>
+            <li><a href="#" class="text-neutral-400 hover:text-orange transition-colors">旅行</a></li>
+            <li><a href="#" class="text-neutral-400 hover:text-orange transition-colors">阅读</a></li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="border-t border-neutral-700 pt-8 text-center text-neutral-500 text-sm">
+        <p>&copy; 2023 大柯的blog. 保留所有权利。</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- 返回顶部按钮 -->
+  <button id="backToTop" class="fixed bottom-6 right-6 bg-orange hover:bg-orange-dark text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all duration-300 opacity-0 invisible">
+    <i class="fa fa-arrow-up" aria-hidden="true"></i>
+  </button>
+
+  <!-- 通知提示 -->
+  <div id="notification" class="fixed top-6 right-6 bg-white shadow-lg rounded-lg p-4 max-w-xs transform translate-x-full transition-transform duration-300 z-50 flex items-start gap-3">
+    <div id="notificationIcon" class="text-green-500 mt-0.5">
+      <i class="fa fa-check-circle text-xl" aria-hidden="true"></i>
+    </div>
+    <div>
+      <h4 id="notificationTitle" class="font-semibold text-neutral-800">成功</h4>
+      <p id="notificationMessage" class="text-neutral-600 text-sm">操作已完成</p>
+    </div>
+    <button id="closeNotification" class="text-neutral-400 hover:text-neutral-600 ml-auto">
+      <i class="fa fa-times" aria-hidden="true"></i>
+    </button>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    // 页面加载完成后执行
+    document.addEventListener('DOMContentLoaded', function() {
+      // 初始化文章数据
+      initArticles();
+      // 加载文章到首页
+      loadArticles();
+      // 更新分类统计
+      updateCategoryCounts();
+      // 初始化事件监听
+      initEventListeners();
+    });
+    
+    // 初始化文章数据
+    function initArticles() {
+      if (!localStorage.getItem('articles')) {
+        // 预设几篇示例文章
+        const sampleArticles = [
+          {
+            id: 1,
+            title: "前端开发效率提升的5个实用技巧",
+            content: "<p>在日常前端开发中，掌握一些实用技巧可以显著提高工作效率。本文分享了5个经过实践验证的方法，从代码片段管理到自动化工具配置，帮助你更高效地完成开发任务。</p><p>首先，建立个人代码片段库是提高效率的基础。可以使用VS Code的Snippets功能，将常用代码片段保存起来，通过简短的触发词快速调用。</p><p>其次，学会使用自动化工具可以节省大量重复工作。例如，使用npm scripts或gulp配置自动化构建流程，自动处理代码压缩、编译等任务。</p>",
+            category: "技术",
+            cover: "https://picsum.photos/600/400?random=1",
+            date: "2023-06-15",
+            readTime: 8
+          },
+          {
+            id: 2,
+            title: "如何建立健康的工作习惯",
+            content: "<p>远程工作已经成为常态，但如何在灵活的工作环境中保持高效和健康？本文分享了我实践多年的工作习惯，包括时间管理、休息策略和环境调整等方面的经验。</p><p>固定的工作时间是保持效率的关键。即使在家工作，也应该建立规律的作息，设定明确的工作开始和结束时间。</p><p>定时休息同样重要。推荐使用番茄工作法：每工作25分钟，休息5分钟。这有助于保持专注度，避免长时间工作导致的疲劳。</p>",
+            category: "生活",
+            cover: "https://picsum.photos/600/400?random=2",
+            date: "2023-06-08",
+            readTime: 5
+          }
+        ];
+        localStorage.setItem('articles', JSON.stringify(sampleArticles));
+      }
+    }
+    
+    // 获取所有文章
+    function getArticles() {
+      return JSON.parse(localStorage.getItem('articles') || '[]');
+    }
+    
+    // 保存文章
+    function saveArticle(article) {
+      const articles = getArticles();
+      
+      if (article.id) {
+        // 更新现有文章
+        const index = articles.findIndex(a => a.id === article.id);
+        if (index !== -1) {
+          articles[index] = article;
+        }
+      } else {
+        // 添加新文章
+        article.id = Date.now(); // 使用时间戳作为唯一ID
+        article.date = new Date().toISOString().split('T')[0]; // 格式化为YYYY-MM-DD
+        // 估算阅读时间（假设每分钟阅读200字）
+        const wordCount = article.content.replace(/<[^>]*>/g, '').length;
+        article.readTime = Math.ceil(wordCount / 200);
+        if (article.readTime < 1) article.readTime = 1;
+        
+        articles.unshift(article); // 添加到数组开头
+      }
+      
+      localStorage.setItem('articles', JSON.stringify(articles));
+      return article;
+    }
+    
+    // 加载文章到首页
+    function loadArticles(category = 'all') {
+      const articles = getArticles();
+      const articlesGrid = document.getElementById('articlesGrid');
+      const noArticles = document.getElementById('noArticles');
+      
+      // 清空现有内容
+      articlesGrid.innerHTML = '';
+      articlesGrid.appendChild(noArticles);
+      
+      // 过滤文章
+      let filteredArticles = articles;
+      if (category !== 'all') {
+        filteredArticles = articles.filter(article => article.category === category);
+      }
+      
+      if (filteredArticles.length === 0) {
+        // 没有文章时显示提示
+        noArticles.classList.remove('hidden');
+        return;
+      }
+      
+      // 隐藏无文章提示
+      noArticles.classList.add('hidden');
+      
+      // 显示文章
+      filteredArticles.forEach((article, index) => {
+        // 添加延迟动画效果
+        setTimeout(() => {
+          const articleCard = createArticleCard(article);
+          articleCard.classList.add('fade-in', 'slide-up');
+          articlesGrid.appendChild(articleCard);
+        }, index * 100);
+      });
+    }
+    
+    // 创建文章卡片
+    function createArticleCard(article) {
+      const card = document.createElement('article');
+      card.className = 'bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl card-hover';
+      
+      // 默认封面图
+      const defaultCover = `https://picsum.photos/600/400?random=${article.id % 10}`;
+      
+      card.innerHTML = `
+        <div class="h-48 overflow-hidden">
+          <img src="${article.cover || defaultCover}" alt="${article.title}" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110 opacity-0 transition-opacity duration-500">
+        </div>
+        <div class="p-6">
+          <div class="flex items-center gap-2 text-sm text-neutral-600 mb-3 flex-wrap">
+            <span class="bg-orange-light text-orange px-2 py-1 rounded-full">${article.category}</span>
+            <span><i class="fa fa-calendar-o mr-1" aria-hidden="true"></i> ${article.date}</span>
+            <span><i class="fa fa-clock-o mr-1" aria-hidden="true"></i> ${article.readTime}分钟阅读</span>
+          </div>
+          <h3 class="text-xl font-bold mb-3 hover:text-orange transition-colors">
+            <a href="#">${article.title}</a>
+          </h3>
+          <p class="text-neutral-600 mb-4 line-clamp-3">
+            ${article.content.replace(/<[^>]*>/g, '').substring(0, 150)}...
+          </p>
+          <div class="flex justify-between items-center">
+            <a href="#" class="inline-flex items-center text-orange font-medium hover:underline">
+              阅读全文 <i class="fa fa-long-arrow-right ml-2" aria-hidden="true"></i>
+            </a>
+            <div class="flex gap-2">
+              <button class="text-neutral-400 hover:text-orange transition-colors edit-article" data-id="${article.id}" title="编辑">
+                <i class="fa fa-pencil" aria-hidden="true"></i>
+              </button>
+              <button class="text-neutral-400 hover:text-red-500 transition-colors delete-article" data-id="${article.id}" title="删除">
+                <i class="fa fa-trash" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      // 图片加载完成后显示
+      const img = card.querySelector('img');
+      img.onload = () => {
+        img.classList.add('opacity-100');
+      };
+      if (img.complete) {
+        img.classList.add('opacity-100');
+      }
+      
+      return card;
+    }
+    
+    // 更新分类统计
+    function updateCategoryCounts() {
+      const articles = getArticles();
+      const counts = {
+        '技术': 0,
+        '生活': 0,
+        '思考': 0,
+        '旅行': 0,
+        '阅读': 0
+      };
+      
+      articles.forEach(article => {
+        if (counts.hasOwnProperty(article.category)) {
+          counts[article.category]++;
+        }
+      });
+      
+      document.getElementById('techCount').textContent = counts['技术'];
+      document.getElementById('lifeCount').textContent = counts['生活'];
+      document.getElementById('thoughtCount').textContent = counts['思考'];
+    }
+    
+    // 显示通知
+    function showNotification(title, message, isError = false) {
+      const notification = document.getElementById('notification');
+      const notificationTitle = document.getElementById('notificationTitle');
+      const notificationMessage = document.getElementById('notificationMessage');
+      const notificationIcon = document.getElementById('notificationIcon');
+      
+      notificationTitle.textContent = title;
+      notificationMessage.textContent = message;
+      
+      // 设置图标和颜色
+      if (isError) {
+        notificationIcon.className = 'text-red-500 mt-0.5';
+        notificationIcon.innerHTML = '<i class="fa fa-exclamation-circle text-xl" aria-hidden="true"></i>';
+      } else {
+        notificationIcon.className = 'text-green-500 mt-0.5';
+        notificationIcon.innerHTML = '<i class="fa fa-check-circle text-xl" aria-hidden="true"></i>';
+      }
+      
+      // 显示通知
+      notification.classList.remove('translate-x-full');
+      
+      // 3秒后自动关闭
+      setTimeout(() => {
+        hideNotification();
+      }, 3000);
+    }
+    
+    // 隐藏通知
+    function hideNotification() {
+      const notification = document.getElementById('notification');
+      notification.classList.add('translate-x-full');
+    }
+    
+    // 初始化事件监听
+    function initEventListeners() {
+      // 移动端菜单切换
+      const menuBtn = document.getElementById('menuBtn');
+      const mobileMenu = document.getElementById('mobileMenu');
+      
+      menuBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+      });
+      
+      // 页面切换
+      document.querySelectorAll('[data-page]').forEach(link => {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          const page = this.getAttribute('data-page');
+          
+          // 隐藏所有页面
+          document.querySelectorAll('.page-content').forEach(pageEl => {
+            pageEl.classList.add('hidden');
+          });
+          
+          // 显示目标页面
+          document.getElementById(`${page}Page`).classList.remove('hidden');
+          
+          // 关闭移动菜单
+          mobileMenu.classList.add('hidden');
+          
+          // 滚动到顶部
+          window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+          });
+        });
+      });
+      
+      // 返回顶部按钮
+      const backToTopBtn = document.getElementById('backToTop');
+      
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) {
+          backToTopBtn.classList.remove('opacity-0', 'invisible');
+          backToTopBtn.classList.add('opacity-100', 'visible');
+        } else {
+          backToTopBtn.classList.remove('opacity-100', 'visible');
+          backToTopBtn.classList.add('opacity-0', 'invisible');
+        }
+        
+        // 导航栏滚动效果
+        const header = document.querySelector('header');
+        if (window.scrollY > 100) {
+          header.classList.add('py-2');
+          header.classList.remove('py-4');
+        } else {
+          header.classList.add('py-4');
+          header.classList.remove('py-2');
+        }
+      });
+      
+      backToTopBtn.addEventListener('click', () => {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      });
+      
+      // 文章表单提交
+      const articleForm = document.getElementById('articleForm');
+      
+      articleForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // 获取表单数据
+        const article = {
+          title: document.getElementById('articleTitle').value,
+          category: document.getElementById('articleCategory').value,
+          cover: document.getElementById('articleCover').value,
+          content: document.getElementById('articleContent').innerHTML
+        };
+        
+        // 验证表单
+        if (!article.title || !article.category || !article.content.trim()) {
+          showNotification('错误', '请填写标题、分类和内容', true);
+          return;
+        }
+        
+        // 保存文章
+        saveArticle(article);
+        
+        // 重置表单
+        articleForm.reset();
+        document.getElementById('articleContent').innerHTML = '';
+        
+        // 显示成功通知
+        showNotification('成功', '文章已发布');
+        
+        // 切换到首页
+        document.querySelectorAll('.page-content').forEach(pageEl => {
+          pageEl.classList.add('hidden');
+        });
+        document.getElementById('homePage').classList.remove('hidden');
+        
+        // 重新加载文章列表
+        loadArticles();
+        // 更新分类统计
+        updateCategoryCounts();
+      });
+      
+      // 分类筛选
+      document.querySelectorAll('.category-filter').forEach(button => {
+        button.addEventListener('click', function() {
+          // 更新按钮样式
+          document.querySelectorAll('.category-filter').forEach(btn => {
+            btn.classList.remove('bg-orange', 'text-white');
+            btn.classList.add('bg-white', 'border', 'border-neutral-300', 'hover:border-orange', 'hover:text-orange');
+          });
+          this.classList.remove('bg-white', 'border', 'border-neutral-300', 'hover:border-orange', 'hover:text-orange');
+          this.classList.add('bg-orange', 'text-white');
+          
+          // 加载对应分类的文章
+          const category = this.getAttribute('data-category');
+          loadArticles(category);
+        });
+      });
+      
+      // 编辑器工具栏
+      document.querySelectorAll('.editor-toolbar button').forEach(button => {
+        button.addEventListener('click', function() {
+          const action = this.getAttribute('data-action');
+          const content = document.getElementById('articleContent');
+          
+          // 确保内容区获得焦点
+          content.focus();
+          
+          switch (action) {
+            case 'bold':
+              document.execCommand('bold', false, null);
+              break;
+            case 'italic':
+              document.execCommand('italic', false, null);
+              break;
+            case 'link':
+              const url = prompt('请输入链接地址:');
+              if (url) {
+                document.execCommand('createLink', false, url);
+              }
+              break;
+            case 'image':
+              const src = prompt('请输入图片URL:');
+              if (src) {
+                document.execCommand('insertImage', false, src);
+              }
+              break;
+            case 'heading':
+              document.execCommand('formatBlock', false, '<h3>');
+              break;
+            case 'list':
+              document.execCommand('insertUnorderedList', false, null);
+              break;
+          }
+        });
+      });
+      
+      // 预览按钮
+      const previewBtn = document.getElementById('previewBtn');
+      const previewModal = document.getElementById('previewModal');
+      const previewContent = document.getElementById('previewContent');
+      const closePreviewBtn = document.getElementById('closePreviewBtn');
+      
+      previewBtn.addEventListener('click', function() {
+        const title = document.getElementById('articleTitle').value || '未命名文章';
+        const category = document.getElementById('articleCategory').value || '未分类';
+        const content = document.getElementById('articleContent').innerHTML || '<p>无内容</p>';
+        const cover = document.getElementById('articleCover').value || `https://picsum.photos/600/400?random=99`;
+        
+        previewContent.innerHTML = `
+          <div class="mb-6">
+            <span class="bg-orange-light text-orange px-2 py-1 rounded-full text-sm">${category}</span>
+          </div>
+          <h1 class="text-3xl font-bold mb-6">${title}</h1>
+          <div class="mb-8">
+            <img src="${cover}" alt="文章封面" class="w-full h-64 object-cover rounded-lg">
+          </div>
+          <div class="prose max-w-none">
+            ${content}
+          </div>
+        `;
+        
+        previewModal.classList.remove('hidden');
+      });
+      
+      closePreviewBtn.addEventListener('click', function() {
+        previewModal.classList.add('hidden');
+      });
+      
+      // 点击模态框外部关闭
+      previewModal.addEventListener('click', function(e) {
+        if (e.target === previewModal) {
+          previewModal.classList.add('hidden');
+        }
+      });
+      
+      // 关闭通知
+      document.getElementById('closeNotification').addEventListener('click', hideNotification);
+      
+      // 文章网格事件委托 - 处理编辑和删除
+      document.getElementById('articlesGrid').addEventListener('click', function(e) {
+        // 编辑文章
+        if (e.target.closest('.edit-article')) {
+          e.preventDefault();
+          const id = parseInt(e.target.closest('.edit-article').getAttribute('data-id'));
+          const articles = getArticles();
+          const article = articles.find(a => a.id === id);
+          
+          if (article) {
+            // 填充表单
+            document.getElementById('articleTitle').value = article.title;
+            document.getElementById('articleCategory').value = article.category;
+            document.getElementById('articleCover').value = article.cover || '';
+            document.getElementById('articleContent').innerHTML = article.content;
+            
+            // 切换到写文章页面
+            document.querySelectorAll('.page-content').forEach(pageEl => {
+              pageEl.classList.add('hidden');
+            });
+            document.getElementById('writePage').classList.remove('hidden');
+            
+            // 滚动到顶部
+            window.scrollTo({
+              top: 0,
+              behavior: 'smooth'
+            });
+          }
+        }
+        
+        // 删除文章
+        if (e.target.closest('.delete-article')) {
+          e.preventDefault();
+          const id = parseInt(e.target.closest('.delete-article').getAttribute('data-id'));
+          
+          if (confirm('确定要删除这篇文章吗？')) {
+            const articles = getArticles();
+            const filteredArticles = articles.filter(a => a.id !== id);
+            localStorage.setItem('articles', JSON.stringify(filteredArticles));
+            
+            // 重新加载文章列表
+            loadArticles();
+            // 更新分类统计
+            updateCategoryCounts();
+            
+            showNotification('成功', '文章已删除');
+          }
+        }
+      });
+    }
+  </script>
 </body>
 </html>
